@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: patient-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydatabase
+    username: myuser
+    password: secret
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  sql:
+    init:
+#      Checks the structure if it changed even with update as the ddl
+      mode: always
+
+server:
+  port: 4000

@@ -1,0 +1,103 @@
+{
+  "info": {
+    "name": "Patient API - Localhost",
+    "description": "Test suite for PatientController endpoints on localhost:4000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Patients",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/patients",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["patients"]
+        }
+      }
+    },
+    {
+      "name": "Get Patient by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/patients/{{patientId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["patients", "{{patientId}}"]
+        }
+      }
+    },
+    {
+      "name": "Create Patient",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"johndoe@example.com\",\n  \"address\": \"123 Main St, Springfield\",\n  \"birthDate\": \"1990-01-15T00:00:00Z\",\n  \"registeredDate\": \"2025-06-10T12:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/patients",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["patients"]
+        }
+      }
+    },
+    {
+      "name": "Update Patient",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\",\n  \"address\": \"456 Updated St, Springfield\",\n  \"birthDate\": \"1990-01-15T00:00:00Z\",\n  \"registeredDate\": \"2025-06-11T12:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/patients/{{patientId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["patients", "{{patientId}}"]
+        }
+      }
+    },
+    {
+      "name": "Delete Patient",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/patients/{{patientId}}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["patients", "{{patientId}}"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "patientId",
+      "value": "PUT-A-REAL-UUID-HERE"
+    }
+  ]
+}

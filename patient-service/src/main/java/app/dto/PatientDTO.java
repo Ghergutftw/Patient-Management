@@ -1,5 +1,6 @@
 package app.dto;
 
+import app.dto.validators.CreatePatientValidationGroup;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +35,6 @@ public class PatientDTO implements Serializable {
     @NotNull(message = "Birth date is required")
     Date birthDate;
 
-    @NotNull(message = "Registered date is required")
+    @NotBlank(groups = CreatePatientValidationGroup.class, message = "Registered date is required")
     Date registeredDate;
 }

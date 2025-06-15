@@ -11,6 +11,7 @@ spring:
       ddl-auto: update
     show-sql: true
     database:
+    open-in-view: false
   devtools:
     restart:
       enabled: false
@@ -20,6 +21,10 @@ spring:
     init:
 #      Checks the structure if it changed even with update as the ddl
       mode: always
+
+logging:
+  level:
+    root: info
 
 server:
   port: 4000

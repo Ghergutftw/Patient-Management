@@ -1,12 +1,17 @@
 package app.controller;
 
 import app.dto.PatientDTO;
+import app.dto.validators.CreatePatientValidationGroup;
+import app.exception.EmailAlreadyExistsException;
 import app.service.PatientService;
+import ch.qos.logback.core.joran.spi.DefaultClass;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -39,7 +44,7 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<PatientDTO> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
+    public ResponseEntity<PatientDTO> createPatient(@Validated({DefaultClass.class,CreatePatientValidationGroup.class}) @RequestBody PatientDTO patientDTO) throws EmailAlreadyExistsException {
         log.info("Creating new patient");
         PatientDTO createdPatient = patientService.createPatient(patientDTO);
         log.info("Patient created with pacient code: {}", createdPatient.getPatientCode());

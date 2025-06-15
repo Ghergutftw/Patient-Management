@@ -40,7 +40,6 @@ public class Patient {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
 
-    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date registeredDate;
 

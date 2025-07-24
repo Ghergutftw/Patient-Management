@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,9 +25,6 @@ public class Patient {
     private UUID id;
 
     @NotNull
-    private String patientCode;
-
-    @NotNull
     private String name;
 
     @NotNull
@@ -41,14 +39,15 @@ public class Patient {
     private Date birthDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull
     private Date registeredDate;
 
-    @PrePersist
-    public void assignCode() {
-        if (this.patientCode == null) {
-            this.patientCode = CodeGenerator.generateCode("patient_code_seq", "P", 6);
-        }
-    }
+//    @PrePersist
+//    public void assignCode() {
+//        if (this.patientCode == null) {
+//            this.patientCode = CodeGenerator.generateCode("patient_code_seq", "P", 6);
+//        }
+//    }
 
     @Override
     public final boolean equals(Object o) {

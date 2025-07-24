@@ -4,18 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
-      <change afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/validators/CreatePatientValidationGroup.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/exception/EmailAlreadyExistsException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/exception/PatientNotFoundException.java" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/controller/PatientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/controller/PatientController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/repository/PatientRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/repository/PatientRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/model/Patient.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/model/Patient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/sequence_initializer.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/data.sql" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/data.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,12 +31,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Ghergutftw"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Ghergutftw&quot;
   }
-}]]></component>
+}</component>
   <component name="GitToolBoxStore">
     <option name="recentBranches">
       <RecentBranches>
@@ -65,12 +62,12 @@
       </RecentBranches>
     </option>
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Ghergutftw/Patient-Management.git",
-    "accountId": "55580988-93b8-43af-853d-9359f70d98c0"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Ghergutftw/Patient-Management.git&quot;,
+    &quot;accountId&quot;: &quot;55580988-93b8-43af-853d-9359f70d98c0&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38-sources.jar!/lombok/Value.java" root0="SKIP_INSPECTION" />
   </component>
@@ -106,6 +103,8 @@
     "HTTP Request.generated-requests | #3.executor": "Run",
     "HTTP Request.generated-requests | Get all patients.executor": "Run",
     "Maven.patient-service [clean,package].executor": "Run",
+    "Maven.patient-service [clean].executor": "Run",
+    "Maven.patient-service [compile].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -154,6 +153,13 @@
       <method v="2" />
     </configuration>
     <configuration name="PatientServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <additionalParameters>
+        <param>
+          <option name="enabled" value="true" />
+          <option name="name" value="management.endpoint.env.show-values" />
+          <option name="value" value="when_authorized" />
+        </param>
+      </additionalParameters>
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="patient-service" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="app.PatientServiceApplication" />
@@ -206,8 +212,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.25410.129" />
-        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-IU-251.25410.129" />
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
       </set>
     </attachedChunks>
   </component>
@@ -223,7 +229,11 @@
       <workItem from="1749631207087" duration="1137000" />
       <workItem from="1749632367831" duration="10800000" />
       <workItem from="1749852972511" duration="203000" />
-      <workItem from="1749970935314" duration="4406000" />
+      <workItem from="1749970935314" duration="5353000" />
+      <workItem from="1750275286404" duration="162000" />
+      <workItem from="1751132390802" duration="450000" />
+      <workItem from="1751985803262" duration="39000" />
+      <workItem from="1753389464373" duration="2484000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -233,7 +243,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749971686211</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function">
+      <option name="closed" value="true" />
+      <created>1749975563624</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1749975563624</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -241,7 +259,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="-Sequence number generator&#10;-ControllerAdvice with Custom Exception" />
-    <option name="LAST_COMMIT_MESSAGE" value="-Sequence number generator&#10;-ControllerAdvice with Custom Exception" />
+    <MESSAGE value="-Custom Message for Validation&#10;-Separate Validation Check on function" />
+    <MESSAGE value="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function" />
+    <option name="LAST_COMMIT_MESSAGE" value="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

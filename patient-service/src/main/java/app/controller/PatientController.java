@@ -47,8 +47,7 @@ public class PatientController {
     public ResponseEntity<PatientDTO> createPatient(@Validated({DefaultClass.class,CreatePatientValidationGroup.class}) @RequestBody PatientDTO patientDTO) throws EmailAlreadyExistsException {
         log.info("Creating new patient");
         PatientDTO createdPatient = patientService.createPatient(patientDTO);
-        log.info("Patient created with pacient code: {}", createdPatient.getPatientCode());
-        return ResponseEntity.created(URI.create("/patients/" + createdPatient.getPatientCode()))
+        return ResponseEntity.created(URI.create("/patients/" + createdPatient.getId()))
                 .body(createdPatient);
     }
 

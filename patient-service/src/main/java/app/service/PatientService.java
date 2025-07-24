@@ -2,7 +2,7 @@ package app.service;
 
 import app.dto.PatientDTO;
 import app.exception.EmailAlreadyExistsException;
-import app.helper.CodeGenerator;
+import app.exception.PatientNotFoundException;
 import app.mapper.PatientMapper;
 import app.model.Patient;
 import app.repository.PatientRepository;
@@ -38,7 +38,6 @@ public class PatientService {
     }
 
     public PatientDTO createPatient(PatientDTO patientDTO) throws EmailAlreadyExistsException {
-        log.info("Creating a new patient with patient code: {}", patientDTO.getPatientCode());
         Patient patient = patientMapper.toPatient(patientDTO);
 
         if(patientRepository.existsByEmail(patientDTO.getEmail())) {
@@ -52,14 +51,12 @@ public class PatientService {
     public Optional<PatientDTO> updatePatient(UUID id, PatientDTO patientDTO) {
         log.info("Updating patient with id: {}", id);
 
+        patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException("Patient with id " + id + " not found"));
+
         return patientRepository.findById(id)
                 .map(existingPatient -> {
                     Patient updatedPatient = patientMapper.toPatient(patientDTO);
-
-                    if(updatedPatient.getPatientCode()== null){
-                        updatedPatient.setPatientCode(
-                                CodeGenerator.generateCode("patient_code_seq", "P", 6));
-                    }
                     updatedPatient.setId(id);
                     Patient savedPatient = patientRepository.save(updatedPatient);
                     return patientMapper.toPatientDTO(savedPatient);

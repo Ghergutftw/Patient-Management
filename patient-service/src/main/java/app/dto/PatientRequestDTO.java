@@ -1,9 +1,10 @@
 package app.dto;
 
 import app.dto.validators.CreatePatientValidationGroup;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,7 +14,7 @@ import java.util.UUID;
  * DTO for {@link app.model.Patient}
  */
 @Value
-public class PatientDTO implements Serializable {
+public class PatientRequestDTO implements Serializable {
 
     UUID id;
 
@@ -26,13 +27,18 @@ public class PatientDTO implements Serializable {
     String email;
 
     @NotBlank(message = "Address is required")
+    @Size(min = 5, max = 100, message = "Address must be between 5 and 100 characters")
     String address;
 
     @NotNull(message = "Birth date is required")
     @Past(message = "Birth date must be in the past")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     Date birthDate;
 
-    @NotNull(message = "Registered date is required")
-    @PastOrPresent(message = "Registered date must be in the past or present") // or @Future if needed
+    @NotNull(message = "Registered date is required", groups = CreatePatientValidationGroup.class)
+    @PastOrPresent(message = "Registered date must be in the past or present", groups = CreatePatientValidationGroup.class)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     Date registeredDate;
 }

@@ -10,9 +10,12 @@
 	</parent>
 	<groupId>com.pm</groupId>
 	<artifactId>patient-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+<!--	For push snapshots to maven-snapshots in nexus-->
+<!--	<version>0.0.1-SNAPSHOT</version>-->
+	<version>0.0.1</version>
 	<name>patient-service</name>
 	<description>patient-service</description>
+	<packaging>war</packaging>
 	<url/>
 	<licenses>
 		<license/>
@@ -28,6 +31,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -79,6 +83,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.9</version>
+		</dependency>
     </dependencies>
 
 
@@ -113,6 +122,7 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -123,9 +133,24 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<image>
+						<name>${project.artifactId}:${maven.build.timestamp}</name>
+					</image>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
+
+	<distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<url>http://localhost:8081/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<url>http://localhost:8081/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 </project>

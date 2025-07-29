@@ -1,8 +1,7 @@
 package app.service;
 
-import app.dto.PatientDTO;
+import app.dto.PatientRequestDTO;
 import app.exception.EmailAlreadyExistsException;
-import app.exception.PatientNotFoundException;
 import app.mapper.PatientMapper;
 import app.model.Patient;
 import app.repository.PatientRepository;
@@ -19,46 +18,53 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
+
 public class PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
 
-    public List<PatientDTO> getAllPatients() {
+    public List<PatientRequestDTO> getAllPatients() {
         log.info("Fetching all patients from the repository");
         return patientRepository.findAll().stream()
                 .map(patientMapper::toPatientDTO)
                 .toList();
     }
     
-    public Optional<PatientDTO> getPatientById(UUID id) {
+    public Optional<PatientRequestDTO> getPatientById(UUID id) {
         log.info("Fetching patient with id: {}", id);
         return patientRepository.findById(id)
                 .map(patientMapper::toPatientDTO);
     }
 
-    public PatientDTO createPatient(PatientDTO patientDTO) throws EmailAlreadyExistsException {
-        Patient patient = patientMapper.toPatient(patientDTO);
+    public PatientRequestDTO createPatient(PatientRequestDTO patientRequestDTO) throws EmailAlreadyExistsException {
+        Patient patient = patientMapper.toPatient(patientRequestDTO);
 
-        if(patientRepository.existsByEmail(patientDTO.getEmail())) {
-            log.error("Patient with email {} already exists", patientDTO.getEmail());
-            throw new EmailAlreadyExistsException("Patient with email " + patientDTO.getEmail() + " already exists");
+        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+            log.error("Patient with email {} already exists", patientRequestDTO.getEmail());
+            throw new EmailAlreadyExistsException("Patient with email " + patientRequestDTO.getEmail() + " already exists");
         }
         Patient savedPatient = patientRepository.save(patient);
         return patientMapper.toPatientDTO(savedPatient);
     }
-    
-    public Optional<PatientDTO> updatePatient(UUID id, PatientDTO patientDTO) {
-        log.info("Updating patient with id: {}", id);
 
-        patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient with id " + id + " not found"));
 
+    public Optional<PatientRequestDTO> updatePatient(UUID id, PatientRequestDTO patientRequestDTO) {
         return patientRepository.findById(id)
                 .map(existingPatient -> {
-                    Patient updatedPatient = patientMapper.toPatient(patientDTO);
-                    updatedPatient.setId(id);
-                    Patient savedPatient = patientRepository.save(updatedPatient);
+                    // Update only the provided fields
+                    existingPatient.setName(patientRequestDTO.getName());
+                    existingPatient.setEmail(patientRequestDTO.getEmail());
+                    existingPatient.setAddress(patientRequestDTO.getAddress());
+                    existingPatient.setBirthDate(patientRequestDTO.getBirthDate());
+
+                    // Only update registeredDate if it's provided in the DTO
+                    if (patientRequestDTO.getRegisteredDate() != null) {
+                        existingPatient.setRegisteredDate(patientRequestDTO.getRegisteredDate());
+                    }
+                    // Otherwise, keep the existing registeredDate unchanged
+
+                    Patient savedPatient = patientRepository.save(existingPatient);
                     return patientMapper.toPatientDTO(savedPatient);
                 });
     }
@@ -69,6 +75,7 @@ public class PatientService {
             patientRepository.deleteById(id);
             return true;
         }
+        log.warn("Patient with id: {} not found for deletion", id);
         return false;
     }
 }

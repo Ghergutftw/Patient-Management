@@ -19,12 +19,23 @@ spring:
       enabled: false
   sql:
     init:
-#      Checks the structure if it changed even with update as the ddl
       mode: always
+#     Inhibits the creation of tables based on entities
+#      mode: never
+  jackson:
+    date-format: yyyy-MM-dd
+    time-zone: UTC
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
 
 logging:
   level:
     root: info
 
 server:
-  port: 4000
+  port: 8080

@@ -1,14 +1,19 @@
 package app.model;
 
-import app.helper.CodeGenerator;
-import jakarta.persistence.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,6 +23,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@Tag(name = "Patient", description = "Patient entity representing a healthcare patient")
 public class Patient {
 
     @Id
@@ -39,7 +45,6 @@ public class Patient {
     private Date birthDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull
     private Date registeredDate;
 
 //    @PrePersist

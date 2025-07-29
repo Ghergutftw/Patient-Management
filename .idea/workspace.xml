@@ -5,14 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function">
+      <change afterPath="$PROJECT_DIR$/.run/patient-service-db.run.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/img.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/img_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/patient-service/docker-compose.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/patient-service/my-settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/controller/PatientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/controller/PatientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientRequestDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/mapper/PatientMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/mapper/PatientMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/model/Patient.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/model/Patient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/data.sql" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/data.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +32,7 @@
         <option value="com.intellij.jpb.NewClass" />
         <option value="Class" />
         <option value="Interface" />
+        <option value="OpenRewrite Recipe" />
       </list>
     </option>
   </component>
@@ -98,14 +106,25 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Docker.compose.yaml.postgres: Compose Deployment.executor": "Run",
+    "Docker.patient-service-db.executor": "Run",
     "Docker.patient-service/compose.yaml.postgres: Compose Deployment.executor": "Run",
+    "Downloaded.Files.Path.Enabled": "false",
     "HTTP Request.generated-requests | #2.executor": "Run",
     "HTTP Request.generated-requests | #3.executor": "Run",
     "HTTP Request.generated-requests | Get all patients.executor": "Run",
     "Maven.patient-service [clean,package].executor": "Run",
     "Maven.patient-service [clean].executor": "Run",
     "Maven.patient-service [compile].executor": "Run",
+    "Maven.patient-service [deploy].executor": "Run",
+    "Maven.patient-service [org.apache.maven.plugins:maven-antrun-plugin:3.1.0:run].executor": "Run",
+    "Maven.patient-service [org.apache.maven.plugins:maven-clean-plugin:3.4.1:help].executor": "Run",
+    "Maven.patient-service [org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile].executor": "Run",
+    "Maven.patient-service [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image-no-fork].executor": "Run",
+    "Maven.patient-service [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
@@ -122,7 +141,11 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.fileTypes"
+    "project.structure.last.edited": "Global Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2689655",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default"
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
@@ -142,16 +165,7 @@
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\patient-service" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.PatientServiceApplication">
-    <configuration name="generated-requests | Get all patients" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="Get all patients" index="2" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="generated-requests | #2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#2" index="2" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="generated-requests | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" executionIdentifier="#3" index="3" runType="Run single request">
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Docker.patient-service-db">
     <configuration name="PatientServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <additionalParameters>
         <param>
@@ -173,41 +187,10 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="compose.yaml.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="postgres" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="compose.yaml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="patient-service/compose.yaml.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="postgres" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="patient-service/compose.yaml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="HTTP Request.generated-requests | #3" />
-        <item itemvalue="HTTP Request.generated-requests | Get all patients" />
-        <item itemvalue="HTTP Request.generated-requests | #2" />
-        <item itemvalue="Docker.compose.yaml.postgres: Compose Deployment" />
-        <item itemvalue="Docker.patient-service/compose.yaml.postgres: Compose Deployment" />
-      </list>
-    </recent_temporary>
+    <list>
+      <item itemvalue="Docker.patient-service-db" />
+      <item itemvalue="Spring Boot.PatientServiceApplication" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -216,6 +199,9 @@
         <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
       </set>
     </attachedChunks>
+  </component>
+  <component name="StructureViewState">
+    <option name="selectedTab" value="Logical" />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -234,6 +220,9 @@
       <workItem from="1751132390802" duration="450000" />
       <workItem from="1751985803262" duration="39000" />
       <workItem from="1753389464373" duration="2484000" />
+      <workItem from="1753795605388" duration="9561000" />
+      <workItem from="1753825132980" duration="443000" />
+      <workItem from="1753825588287" duration="4035000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />

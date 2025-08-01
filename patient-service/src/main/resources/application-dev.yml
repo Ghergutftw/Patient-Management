@@ -1,6 +1,4 @@
 spring:
-#  profiles:
-#    active: x,y,z
   application:
     name: patient-service
   datasource:
@@ -22,8 +20,8 @@ spring:
   sql:
     init:
       mode: always
-#     Inhibits the creation of tables based on entities
-#      mode: never
+  #     Inhibits the creation of tables based on entities
+  #      mode: never
   jackson:
     date-format: yyyy-MM-dd
     time-zone: UTC

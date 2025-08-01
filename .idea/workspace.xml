@@ -4,21 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function">
-      <change afterPath="$PROJECT_DIR$/.run/patient-service-db.run.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img_1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patient-service/docker-compose.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patient-service/my-settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md">
+      <change afterPath="$PROJECT_DIR$/.run/patient-service.run.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/patient-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application-dev.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application-docker.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.run/patient-service-db.run.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.run/patient-service-db.run.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/controller/PatientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/controller/PatientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/dto/PatientRequestDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/mapper/PatientMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/mapper/PatientMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/model/Patient.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/model/Patient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,6 +26,7 @@
         <option value="Class" />
         <option value="Interface" />
         <option value="OpenRewrite Recipe" />
+        <option value="Dockerfile" />
       </list>
     </option>
   </component>
@@ -86,6 +80,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="MavenImportPreferences">
+    <option name="explicitlyEnabledProfiles" value="docker" />
+  </component>
   <component name="MavenRunner">
     <option name="skipTests" value="true" />
   </component>
@@ -105,13 +102,17 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Docker.Docker Image (1).executor": "Run",
+    "Docker.Docker Image.executor": "Run",
     "Docker.compose.yaml.postgres: Compose Deployment.executor": "Run",
     "Docker.patient-service-db.executor": "Run",
+    "Docker.patient-service.executor": "Run",
     "Docker.patient-service/compose.yaml.postgres: Compose Deployment.executor": "Run",
     "Downloaded.Files.Path.Enabled": "false",
     "HTTP Request.generated-requests | #2.executor": "Run",
     "HTTP Request.generated-requests | #3.executor": "Run",
     "HTTP Request.generated-requests | Get all patients.executor": "Run",
+    "JavaScript Debug.patient.html.executor": "Run",
     "Maven.patient-service [clean,package].executor": "Run",
     "Maven.patient-service [clean].executor": "Run",
     "Maven.patient-service [compile].executor": "Run",
@@ -133,6 +134,8 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.PatientServiceApplication.executor": "Debug",
+    "database.data.extractors.current.export.id": "HTML-Groovy.html.groovy",
+    "database.data.extractors.current.id": "HTML-Groovy.html.groovy",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/patient-service/src/main/java/app/exception",
@@ -165,7 +168,10 @@
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\patient-service" />
     </key>
   </component>
-  <component name="RunManager" selected="Docker.patient-service-db">
+  <component name="RunManager" selected="JavaScript Debug.patient.html">
+    <configuration name="patient.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/patient-managment/patient-service/patient.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
     <configuration name="PatientServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <additionalParameters>
         <param>
@@ -187,10 +193,22 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-image" temporary="true">
+      <deployment type="docker-image" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Docker.patient-service-db" />
+      <item itemvalue="Docker.patient-service" />
+      <item itemvalue="JavaScript Debug.patient.html" />
       <item itemvalue="Spring Boot.PatientServiceApplication" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.patient.html" />
+        <item itemvalue="Docker.patient-service" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -222,7 +240,8 @@
       <workItem from="1753389464373" duration="2484000" />
       <workItem from="1753795605388" duration="9561000" />
       <workItem from="1753825132980" duration="443000" />
-      <workItem from="1753825588287" duration="4035000" />
+      <workItem from="1753825588287" duration="4481000" />
+      <workItem from="1754000900408" duration="5917000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -240,7 +259,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749975563624</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md">
+      <option name="closed" value="true" />
+      <created>1753829715656</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1753829715656</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -250,7 +277,8 @@
     <MESSAGE value="-Sequence number generator&#10;-ControllerAdvice with Custom Exception" />
     <MESSAGE value="-Custom Message for Validation&#10;-Separate Validation Check on function" />
     <MESSAGE value="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function" />
-    <option name="LAST_COMMIT_MESSAGE" value="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function" />
+    <MESSAGE value="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

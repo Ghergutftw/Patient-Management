@@ -1,0 +1,23 @@
+spring:
+  datasource:
+#    Gets mapped automatically to the environment variable DATABASE_URL
+    url: jdbc:postgresql://patient-service-db:5432/mydatabase
+    username: myuser
+    password: secret
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  jackson:
+    date-format: yyyy-MM-dd
+    time-zone: UTC

@@ -7,16 +7,16 @@
         <option name="envVars">
           <list>
             <DockerEnvVarImpl>
-              <option name="name" value="POSTGRES_USER" />
-              <option name="value" value="admin_user" />
+              <option name="name" value="POSTGRES_DB" />
+              <option name="value" value="mydatabase" />
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
               <option name="name" value="POSTGRES_PASSWORD" />
-              <option name="value" value="password" />
+              <option name="value" value="secret" />
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
-              <option name="name" value="POSTGRES_DB" />
-              <option name="value" value="db" />
+              <option name="name" value="POSTGRES_USER" />
+              <option name="value" value="myuser" />
             </DockerEnvVarImpl>
           </list>
         </option>
@@ -24,7 +24,7 @@
           <list>
             <DockerPortBindingImpl>
               <option name="containerPort" value="5432" />
-              <option name="hostPort" value="5000" />
+              <option name="hostPort" value="5432" />
             </DockerPortBindingImpl>
           </list>
         </option>

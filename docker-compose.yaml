@@ -1,50 +1,269 @@
-version: '3.8'
+# =============================================================================
+# Healthcare Services - Docker Compose Configuration
+# =============================================================================
+# This configuration orchestrates a microservices architecture with:
+# - Patient Service (Spring Boot + PostgreSQL)
+# - Billing Service (gRPC enabled)
+# - Apache Kafka for event streaming
+# - Internal network for secure service communication
+# =============================================================================
 
+# =============================================================================
+# SERVICES CONFIGURATION
+# =============================================================================
 services:
+  # ---------------------------------------------------------------------------
+  # Patient Service - Core patient management microservice
+  # ---------------------------------------------------------------------------
   patient-service:
     build:
       context: ./patient-service
       dockerfile: Dockerfile
     image: patient-service:latest
     container_name: patient-service
+    restart: unless-stopped
+
     environment:
+      # Server Configuration
       - SERVER_PORT=8080
-      - SPRING_DATASOURCE_PASSWORD=secret
+
+      # Database Configuration
       - SPRING_DATASOURCE_URL=jdbc:postgresql://patient-service-db:5432/mydatabase
       - SPRING_DATASOURCE_USERNAME=myuser
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_SQL_INT_MODE=always
-#      - Check the src/main/java/app/grpc/BillingServiceGrpcClient.java
+      - SPRING_DATASOURCE_PASSWORD=secret
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
+      - SPRING_SQL_INIT_MODE=always
+
+      # External Service Configuration
       - BILLING_SERVICE_ADDRESS=billing-service
       - BILLING_SERVICE_GRPC_PORT=9001
-    ports:
-      - "8081:8080"
-    networks:
-      - internal
 
+      # Kafka Configuration
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+    ports:
+      - "8081:8080"  # Host:Container
+
+    networks:
+      - healthcare-network
+
+    depends_on:
+      - patient-service-db
+      - kafka
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  # ---------------------------------------------------------------------------
+  # Analytics Service - Processes patient events from Kafka
+  # ---------------------------------------------------------------------------
+  analytics-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    image: analytics-service:latest
+    container_name: analytics-service
+    restart: unless-stopped
+
+    environment:
+      # Server Configuration
+      - SERVER_PORT=4002
+      # Kafka Configuration
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+    ports:
+      - "4002:4002"
+
+    networks:
+      - healthcare-network
+
+    depends_on:
+      - kafka
+
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:4002/actuator/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+
+  # ---------------------------------------------------------------------------
+  # Patient Database - PostgreSQL instance for patient data
+  # ---------------------------------------------------------------------------
   patient-service-db:
-    image: postgres:latest
+    image: postgres:15-alpine  # Using specific version and alpine for smaller size
     container_name: patient-service-db
+    restart: unless-stopped
+
     environment:
       - POSTGRES_DB=mydatabase
       - POSTGRES_USER=myuser
       - POSTGRES_PASSWORD=secret
-    networks:
-      - internal
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
 
+    volumes:
+      - patient_db_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d  # For initialization scripts
+
+    networks:
+      - healthcare-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Billing Service - Handles billing operations via gRPC
+  # ---------------------------------------------------------------------------
   billing-service:
     build:
       context: ./billing-service
       dockerfile: Dockerfile
     image: billing-service:latest
     container_name: billing-service
-    ports:
-      - "4001:4001"
-      - "9001:9001"
-    networks:
-      - internal
+    restart: unless-stopped
 
+    environment:
+      # Service Configuration
+      - HTTP_PORT=4001
+      - GRPC_PORT=9001
+
+      # Kafka Configuration
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+    ports:
+      - "4001:4001"  # HTTP API
+      - "9001:9001"  # gRPC
+
+    networks:
+      - healthcare-network
+
+    depends_on:
+      - kafka
+
+    healthcheck:
+      test: ["CMD-SHELL", "grpc_health_probe -addr=localhost:9001 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ---------------------------------------------------------------------------
+  # Apache Kafka - Event streaming platform
+  # ---------------------------------------------------------------------------
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    restart: unless-stopped
+
+    environment:
+      # Kafka Cluster Configuration
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+      # Listener Configuration
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+
+      # Topic Configuration
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_NUM_PARTITIONS=3
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
+
+      # Performance Tuning
+      - KAFKA_CFG_LOG_RETENTION_HOURS=168
+      - KAFKA_CFG_LOG_SEGMENT_BYTES=1073741824
+
+    volumes:
+      - kafka_data:/bitnami/kafka
+
+    networks:
+      - healthcare-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # Kafka UI (Optional) - Web interface for Kafka management
+  # ---------------------------------------------------------------------------
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: unless-stopped
+
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=healthcare-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+
+    ports:
+      - "8080:8080"
+
+    networks:
+      - healthcare-network
+
+    depends_on:
+      - kafka
+
+    profiles:
+      - monitoring  # Only start with --profile monitoring
+
+# =============================================================================
+# NETWORKS CONFIGURATION
+# =============================================================================
 networks:
   internal:
-#    It has to exist for the services to communicate
-    external: true
+    external: {}
+  healthcare-network:
+    external: {}
+
+# =============================================================================
+# VOLUMES CONFIGURATION
+# =============================================================================
+volumes:
+  # Persistent storage for PostgreSQL data
+  patient_db_data:
+    driver: local
+    name: patient_db_data
+
+  # Persistent storage for Kafka data
+  kafka_data:
+    driver: local
+    name: kafka_data
+
+# =============================================================================
+# USAGE INSTRUCTIONS
+# =============================================================================
+#
+# Start all services:
+#   docker-compose up -d
+#
+# Start with monitoring tools:
+#   docker-compose -f=docker-compose.yaml --profile monitoring up -d
+#
+# View logs:
+#   docker-compose logs -f [service-name]
+#
+# Scale services:
+#   docker-compose up -d --scale billing-service=2
+#
+# Stop all services:
+#   docker-compose down
+#
+# Clean up (including volumes):
+#   docker-compose down -v
+#
+# =============================================================================

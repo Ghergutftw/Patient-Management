@@ -7,6 +7,42 @@
         <option name="envVars">
           <list>
             <DockerEnvVarImpl>
+              <option name="name" value="BILLING_SERVICE_ADDRESS" />
+              <option name="value" value="billing-service" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="BILLING_SERVICE_GRPC_PORT" />
+              <option name="value" value="9001" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="KAFKA_CFG_ADVERTISED_LISTENERS" />
+              <option name="value" value="PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="KAFKA_CFG_CONTROLLER_LISTENER_NAMES" />
+              <option name="value" value="CONTROLLER" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="KAFKA_CFG_CONTROLLER_QUORUM_VOTERS" />
+              <option name="value" value="0@kafka:9093" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP" />
+              <option name="value" value="CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="KAFKA_CFG_LISTENERS" />
+              <option name="value" value="PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="KAFKA_CFG_NODE_ID" />
+              <option name="value" value="0" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="KAFKA_CFG_PROCESS_ROLES" />
+              <option name="value" value="controller,broker" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
               <option name="name" value="SERVER_PORT" />
               <option name="value" value="8080" />
             </DockerEnvVarImpl>
@@ -24,20 +60,15 @@
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
               <option name="name" value="SPRING_JPA_HIBERNATE_DDL_AUTO" />
-              <option name="value" value="update" />
+              <option name="value" value="create" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="SPRING_KAFKA_BOOTSTRAP_SERVERS" />
+              <option name="value" value="kafka:9092" />
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
               <option name="name" value="SPRING_SQL_INT_MODE" />
               <option name="value" value="always" />
-            </DockerEnvVarImpl>
-<!--            These are for-->
-            <DockerEnvVarImpl>
-              <option name="name" value="BILLING_SERVICE_ADDRESS" />
-              <option name="value" value="billing-service" />
-            </DockerEnvVarImpl>
-            <DockerEnvVarImpl>
-              <option name="name" value="BILLING_SERVICE_GRPC_PORT" />
-              <option name="value" value="9001" />
             </DockerEnvVarImpl>
           </list>
         </option>

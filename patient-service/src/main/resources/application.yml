@@ -27,6 +27,10 @@ spring:
   jackson:
     date-format: yyyy-MM-dd
     time-zone: UTC
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
 springdoc:
   api-docs:

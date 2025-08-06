@@ -3,6 +3,7 @@ package app.service;
 import app.dto.PatientRequestDTO;
 import app.exception.EmailAlreadyExistsException;
 import app.grpc.BillingServiceGrpcClient;
+import app.kafka.KafkaProducer;
 import app.mapper.PatientMapper;
 import app.model.Patient;
 import app.repository.PatientRepository;
@@ -24,6 +25,7 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
     private final PatientMapper patientMapper;
+    private final KafkaProducer kafkaProducer;
 
     public List<PatientRequestDTO> getAllPatients() {
         log.info("Fetching all patients from the repository");
@@ -50,7 +52,7 @@ public class PatientService {
         billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
                 newPatient.getName(), newPatient.getEmail());
 
-
+        kafkaProducer.sendEvent(newPatient);
         log.info("Created new patient with id: {}", newPatient.getId());
 
         return patientMapper.toPatientDTO(newPatient);

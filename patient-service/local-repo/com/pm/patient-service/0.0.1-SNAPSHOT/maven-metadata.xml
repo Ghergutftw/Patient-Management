@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.pm</groupId>
+  <artifactId>patient-service</artifactId>
+  <versioning>
+    <lastUpdated>20250729211438</lastUpdated>
+    <snapshot>
+      <timestamp>20250729.211438</timestamp>
+      <buildNumber>4</buildNumber>
+    </snapshot>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>0.0.1-20250729.211438-4</value>
+        <updated>20250729211438</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>war</extension>
+        <value>0.0.1-20250729.211438-4</value>
+        <updated>20250729211438</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>0.0.1-20250729.211202-1</value>
+        <updated>20250729211202</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+  <version>0.0.1-SNAPSHOT</version>
+</metadata>

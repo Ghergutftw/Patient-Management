@@ -2,6 +2,7 @@ package app.service;
 
 import app.dto.PatientRequestDTO;
 import app.exception.EmailAlreadyExistsException;
+import app.grpc.BillingServiceGrpcClient;
 import app.mapper.PatientMapper;
 import app.model.Patient;
 import app.repository.PatientRepository;
@@ -18,10 +19,10 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
     private final PatientMapper patientMapper;
 
     public List<PatientRequestDTO> getAllPatients() {
@@ -30,7 +31,7 @@ public class PatientService {
                 .map(patientMapper::toPatientDTO)
                 .toList();
     }
-    
+
     public Optional<PatientRequestDTO> getPatientById(UUID id) {
         log.info("Fetching patient with id: {}", id);
         return patientRepository.findById(id)
@@ -38,14 +39,21 @@ public class PatientService {
     }
 
     public PatientRequestDTO createPatient(PatientRequestDTO patientRequestDTO) throws EmailAlreadyExistsException {
-        Patient patient = patientMapper.toPatient(patientRequestDTO);
-
-        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
-            log.error("Patient with email {} already exists", patientRequestDTO.getEmail());
-            throw new EmailAlreadyExistsException("Patient with email " + patientRequestDTO.getEmail() + " already exists");
+        if (patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+            throw new EmailAlreadyExistsException(
+                    "A patient with this email " + "already exists"
+                            + patientRequestDTO.getEmail());
         }
-        Patient savedPatient = patientRepository.save(patient);
-        return patientMapper.toPatientDTO(savedPatient);
+
+        Patient newPatient = patientRepository.save(patientMapper.toPatient(patientRequestDTO));
+
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
+                newPatient.getName(), newPatient.getEmail());
+
+
+        log.info("Created new patient with id: {}", newPatient.getId());
+
+        return patientMapper.toPatientDTO(newPatient);
     }
 
 
@@ -68,7 +76,7 @@ public class PatientService {
                     return patientMapper.toPatientDTO(savedPatient);
                 });
     }
-    
+
     public boolean deletePatient(UUID id) {
         log.info("Deleting patient with id: {}", id);
         if (patientRepository.existsById(id)) {

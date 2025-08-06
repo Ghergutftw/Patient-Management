@@ -4,14 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md">
-      <change afterPath="$PROJECT_DIR$/.run/patient-service.run.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patient-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application-dev.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application-docker.yml" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Making a docker image&#10;-Learning how to make a docker network and how to use it&#10;-How to bind port and use env variables while running">
+      <change afterPath="$PROJECT_DIR$/.run/TheApp.run.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.run/billing-service.run.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/billing-service/src/main/java/com/pm/billingservice/grpc/BillingGrpcService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/billing-service/src/main/proto/billing_service.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/grpc-request/billing-service/create-billing-account.http" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/grpc/BillingServiceGrpcClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/patient-service/src/main/proto/billing_service.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.run/patient-service-db.run.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.run/patient-service-db.run.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.run/patient-service.run.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.run/patient-service.run.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/java/app/service/PatientService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,10 +32,11 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="com.intellij.jpb.NewClass" />
-        <option value="Class" />
         <option value="Interface" />
         <option value="OpenRewrite Recipe" />
         <option value="Dockerfile" />
+        <option value="HTTP Request" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -104,24 +114,36 @@
   "keyToString": {
     "Docker.Docker Image (1).executor": "Run",
     "Docker.Docker Image.executor": "Run",
+    "Docker.TheApp.executor": "Run",
+    "Docker.Unnamed.executor": "Run",
+    "Docker.billing-service.executor": "Run",
     "Docker.compose.yaml.postgres: Compose Deployment.executor": "Run",
     "Docker.patient-service-db.executor": "Run",
     "Docker.patient-service.executor": "Run",
     "Docker.patient-service/compose.yaml.postgres: Compose Deployment.executor": "Run",
     "Downloaded.Files.Path.Enabled": "false",
+    "HTTP Request.create-billing-account | #1.executor": "Run",
     "HTTP Request.generated-requests | #2.executor": "Run",
     "HTTP Request.generated-requests | #3.executor": "Run",
     "HTTP Request.generated-requests | Get all patients.executor": "Run",
+    "JUnit.All in patient-service.executor": "Debug",
     "JavaScript Debug.patient.html.executor": "Run",
+    "Maven.billing-service [clean,package].executor": "Run",
+    "Maven.billing-service [compile].executor": "Run",
+    "Maven.billing-service [org.springframework.boot:spring-boot-maven-plugin:3.5.4:build-image].executor": "Run",
+    "Maven.billing-service [package].executor": "Run",
+    "Maven.billing-service [validate].executor": "Run",
     "Maven.patient-service [clean,package].executor": "Run",
     "Maven.patient-service [clean].executor": "Run",
     "Maven.patient-service [compile].executor": "Run",
     "Maven.patient-service [deploy].executor": "Run",
+    "Maven.patient-service [install].executor": "Run",
     "Maven.patient-service [org.apache.maven.plugins:maven-antrun-plugin:3.1.0:run].executor": "Run",
     "Maven.patient-service [org.apache.maven.plugins:maven-clean-plugin:3.4.1:help].executor": "Run",
     "Maven.patient-service [org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile].executor": "Run",
     "Maven.patient-service [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image-no-fork].executor": "Run",
     "Maven.patient-service [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image].executor": "Run",
+    "Maven.patient-service [package].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Repository.Attach.Annotations": "false",
     "Repository.Attach.JavaDocs": "false",
@@ -133,12 +155,13 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.BillingServiceApplication.executor": "Debug",
     "Spring Boot.PatientServiceApplication.executor": "Debug",
     "database.data.extractors.current.export.id": "HTML-Groovy.html.groovy",
     "database.data.extractors.current.id": "HTML-Groovy.html.groovy",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/patient-service/src/main/java/app/exception",
+    "last_opened_file_path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/patient-service/src",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -161,16 +184,36 @@
       <recent name="app.exception" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\patient-service\src" />
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\patient-service\src\main\java\app\exception" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\patient-service\src\main" />
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment" />
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\patient-service" />
     </key>
   </component>
-  <component name="RunManager" selected="JavaScript Debug.patient.html">
+  <component name="RunManager" selected="Docker.TheApp">
+    <configuration name="create-billing-account | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/grpc-request/billing-service/create-billing-account.http" executionIdentifier="#1" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="All in patient-service" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="patient-service" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="patient.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/patient-managment/patient-service/patient.html" useBuiltInWebServerPort="true">
       <method v="2" />
+    </configuration>
+    <configuration name="BillingServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="billing-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.pm.billingservice.BillingServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <configuration name="PatientServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <additionalParameters>
@@ -194,19 +237,27 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-image" temporary="true">
-      <deployment type="docker-image" />
+      <deployment type="docker-image">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <list>
       <item itemvalue="Docker.patient-service-db" />
       <item itemvalue="Docker.patient-service" />
+      <item itemvalue="Docker.billing-service" />
+      <item itemvalue="Docker.TheApp" />
+      <item itemvalue="HTTP Request.create-billing-account | #1" />
       <item itemvalue="JavaScript Debug.patient.html" />
+      <item itemvalue="JUnit.All in patient-service" />
+      <item itemvalue="Spring Boot.BillingServiceApplication" />
       <item itemvalue="Spring Boot.PatientServiceApplication" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.All in patient-service" />
+        <item itemvalue="HTTP Request.create-billing-account | #1" />
         <item itemvalue="JavaScript Debug.patient.html" />
-        <item itemvalue="Docker.patient-service" />
       </list>
     </recent_temporary>
   </component>
@@ -241,7 +292,13 @@
       <workItem from="1753795605388" duration="9561000" />
       <workItem from="1753825132980" duration="443000" />
       <workItem from="1753825588287" duration="4481000" />
-      <workItem from="1754000900408" duration="5917000" />
+      <workItem from="1754000900408" duration="6569000" />
+      <workItem from="1754040715796" duration="4585000" />
+      <workItem from="1754224673522" duration="144000" />
+      <workItem from="1754225125177" duration="311000" />
+      <workItem from="1754344056983" duration="3124000" />
+      <workItem from="1754431632184" duration="10000" />
+      <workItem from="1754510674879" duration="2869000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -267,7 +324,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753829715656</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="-Making a docker image&#10;-Learning how to make a docker network and how to use it&#10;-How to bind port and use env variables while running">
+      <option name="closed" value="true" />
+      <created>1754007271536</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1754007271536</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -278,7 +343,8 @@
     <MESSAGE value="-Custom Message for Validation&#10;-Separate Validation Check on function" />
     <MESSAGE value="-Custom Message for Validation Exceptions&#10;-Separate Validation Check on function" />
     <MESSAGE value="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md" />
+    <MESSAGE value="-Making a docker image&#10;-Learning how to make a docker network and how to use it&#10;-How to bind port and use env variables while running" />
+    <option name="LAST_COMMIT_MESSAGE" value="-Making a docker image&#10;-Learning how to make a docker network and how to use it&#10;-How to bind port and use env variables while running" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

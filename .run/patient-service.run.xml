@@ -44,7 +44,7 @@
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
               <option name="name" value="SERVER_PORT" />
-              <option name="value" value="8080" />
+              <option name="value" value="4000" />
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
               <option name="name" value="SPRING_DATASOURCE_PASSWORD" />

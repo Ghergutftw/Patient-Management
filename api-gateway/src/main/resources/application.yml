@@ -1,0 +1,84 @@
+server:
+  port: 4004
+
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+#            - id: auth-service-route # How to route to the service from identification service
+#              uri: http://auth-service:4005 #Internal URL in docker
+#              predicates:
+#                - Path=/auth/**
+#              filters:
+#                - StripPrefix=1
+
+            - id: patient-service-route
+              uri: http://patient-service:4000
+              predicates:
+                - Path=/api/patients
+              filters:
+                - StripPrefix=1 # http://localhost:4004/api/patients/123 -> http://patient-service:4004/patients/123 -> /patients/123
+#                - JwtValidation
+
+            - id: api-docs-patient-route
+              uri: http://patient-service:4000
+              predicates:
+                - Path=/api-docs/patient-service
+              filters:
+                - RewritePath=/api-docs/patient-service,/api-docs
+              # REST CLIENT -> http://localhost:4004/api-docs/patients -> http://patient-service:4004/v3/api-docs -> Swagger UI
+  application:
+    name: api-gateway
+#
+#            - id: api-docs-auth-route
+#              uri: http://auth-service:4005
+#              predicates:
+#                - Path=/api-docs/auth
+#              filters:
+#                - RewritePath=/api-docs/auth,/v3/api-docs
+
+
+#spring:
+#  cloud:
+#    gateway:
+#      server:
+#        webflux:
+#          routes:
+#            - id: example-service
+#              uri: http://example-service:8080
+#              predicates:
+#                - Path=/api/**
+#              filters:
+#                # ? PATH MODIFICATION
+#                - StripPrefix=1                       # Remove first path segment
+#                - PrefixPath=/new-prefix              # Add prefix to path
+#                - SetPath=/completely/new/path        # Replace full path
+#                - RewritePath=/old/(?<p>.*), /new/${p} # Regex rewrite
+#
+#                # ? HEADERS (Request/Response)
+#                - AddRequestHeader=X-Trace-ID,12345   # Add header to request
+#                - SetRequestHeader=Authorization,Bearer abc123  # Replace header
+#                - RemoveRequestHeader=Cookie          # Remove header from request
+#                - AddResponseHeader=X-Version,1.0     # Add header to response
+#                - SetResponseHeader=Server,MyGateway  # Replace header in response
+#                - RemoveResponseHeader=Server         # Remove header from response
+#
+#                # ? QUERY PARAMETERS
+#                - AddRequestParameter=lang,en         # Add query parameter
+#
+#                # ? STATUS & REDIRECTS
+#                - SetStatus=401                       # Force response status
+#                - RedirectTo=302,https://example.com  # Redirect to another URL
+#
+#                # ? TRAFFIC CONTROL
+#                - RequestRateLimiter={ "redis-rate-limiter.replenishRate": 10, "redis-rate-limiter.burstCapacity": 20 }
+#                - Retry=3                             # Retry failed requests (default: GET only)
+#                - CircuitBreaker=name=myCB,fallbackUri=forward:/fallback  # Resilience4j circuit breaker
+#                - FallbackHeaders                     # Pass fallback-related headers downstream
+#
+#                # ? SESSION / SECURITY
+#                - SaveSession                         # Persist session before forwarding
+#                - JwtValidation                       # Custom filter (needs to be implemented)

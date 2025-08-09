@@ -25,7 +25,7 @@ services:
 
     environment:
       # Server Configuration
-      - SERVER_PORT=8080
+      - SERVER_PORT=4000
 
       # Database Configuration
       - SPRING_DATASOURCE_URL=jdbc:postgresql://patient-service-db:5432/mydatabase
@@ -42,7 +42,7 @@ services:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 
     ports:
-      - "8081:8080"  # Host:Container
+      - "4000:4000"  # Host:Container
 
     networks:
       - healthcare-network
@@ -89,8 +89,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-
   # ---------------------------------------------------------------------------
   # Patient Database - PostgreSQL instance for patient data
   # ---------------------------------------------------------------------------
@@ -220,6 +218,36 @@ services:
 
     profiles:
       - monitoring  # Only start with --profile monitoring
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    image: api-gateway:latest
+    container_name: api-gateway
+    restart: unless-stopped
+
+    environment:
+      - SERVER_PORT=4004
+#      - SPRING_CLOUD_GATEWAY_ROUTES_PATIENT_SERVICE_URI=http://patient-service:4000
+#      - SPRING_CLOUD_GATEWAY_ROUTES_BILLING_SERVICE_URI=http://billing-service:4001
+
+    ports:
+      - "4004:4004"
+
+    networks:
+      - healthcare-network
+
+    depends_on:
+      - patient-service
+      - billing-service
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4004/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 # =============================================================================
 # NETWORKS CONFIGURATION

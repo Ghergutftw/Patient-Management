@@ -12,6 +12,7 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+    defer-datasource-initialization: true  # 🔹 Ensures data.sql runs AFTER Hibernate creates tables
     database:
     open-in-view: false
   devtools:
@@ -22,7 +23,8 @@ spring:
   sql:
     init:
       mode: always
-#     Inhibits the creation of tables based on entities
+      platform: postgresql
+  #     Inhibits the creation of tables based on entities
 #      mode: never
   jackson:
     date-format: yyyy-MM-dd
@@ -44,6 +46,6 @@ logging:
     root: info
 
 server:
-  port: 8080
+  port: ${patient.service.port}
   http2:
     enabled: true

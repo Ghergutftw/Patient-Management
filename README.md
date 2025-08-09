@@ -1,6 +1,7 @@
 # 🩺 Patient Management API
 
 https://www.youtube.com/watch?v=tseqdcFfTUY&list=PLU9fGabY-d0wpp1QzE1yAd4EqOS3ONnD2&index=1
+https://github.com/chrisblakely01/java-spring-microservices
 
 This is a **Spring Boot** application that provides a REST API for managing patient records. The application follows best practices for RESTful design and includes **OpenAPI 3.1** documentation using **Swagger UI**.
 

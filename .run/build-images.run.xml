@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="build-images" type="CompoundRunConfigurationType">
+    <toRun name="analytics-service [spring-boot:build-image]" type="MavenRunConfiguration" />
+    <toRun name="api-gateway [spring-boot:build-image]" type="MavenRunConfiguration" />
+    <toRun name="billing-service [spring-boot:build-image]" type="MavenRunConfiguration" />
+    <toRun name="patient-service [spring-boot:build-image]" type="MavenRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

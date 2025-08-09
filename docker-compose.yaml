@@ -5,6 +5,7 @@
 # - Patient Service (Spring Boot + PostgreSQL)
 # - Billing Service (gRPC enabled)
 # - Apache Kafka for event streaming
+# - API Gateway as the single entry point
 # - Internal network for secure service communication
 # =============================================================================
 
@@ -41,8 +42,9 @@ services:
       # Kafka Configuration
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 
-    ports:
-      - "4000:4000"  # Host:Container
+    # REMOVED: ports section - no external access
+    # ports:
+    #   - "4000:4000"
 
     networks:
       - healthcare-network
@@ -52,11 +54,12 @@ services:
       - kafka
 
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:4000/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
   # ---------------------------------------------------------------------------
   # Analytics Service - Processes patient events from Kafka
   # ---------------------------------------------------------------------------
@@ -74,8 +77,9 @@ services:
       # Kafka Configuration
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 
-    ports:
-      - "4002:4002"
+    # REMOVED: ports section - no external access
+    # ports:
+    #   - "4002:4002"
 
     networks:
       - healthcare-network
@@ -89,11 +93,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
   # ---------------------------------------------------------------------------
   # Patient Database - PostgreSQL instance for patient data
   # ---------------------------------------------------------------------------
   patient-service-db:
-    image: postgres:15-alpine  # Using specific version and alpine for smaller size
+    image: postgres:15-alpine
     container_name: patient-service-db
     restart: unless-stopped
 
@@ -105,7 +110,11 @@ services:
 
     volumes:
       - patient_db_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d  # For initialization scripts
+      - ./init-scripts:/docker-entrypoint-initdb.d
+
+    # REMOVED: ports section - database only accessible internally
+    # ports:
+    #   - "5432:5432"
 
     networks:
       - healthcare-network
@@ -135,9 +144,10 @@ services:
       # Kafka Configuration
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 
+    # REMOVED: HTTP port mapping - only gRPC exposed for internal communication
+    # Keep gRPC port if other services need direct access, or remove if going through gateway
     ports:
-      - "4001:4001"  # HTTP API
-      - "9001:9001"  # gRPC
+      - "9001:9001"  # gRPC - keep only if needed for direct service-to-service communication
 
     networks:
       - healthcare-network
@@ -182,6 +192,10 @@ services:
       - KAFKA_CFG_LOG_RETENTION_HOURS=168
       - KAFKA_CFG_LOG_SEGMENT_BYTES=1073741824
 
+    # Keep external port for development/debugging - remove in production
+    ports:
+      - "9094:9094"  # External access for development tools
+
     volumes:
       - kafka_data:/bitnami/kafka
 
@@ -208,7 +222,7 @@ services:
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
 
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Keep for development monitoring
 
     networks:
       - healthcare-network
@@ -217,8 +231,11 @@ services:
       - kafka
 
     profiles:
-      - monitoring  # Only start with --profile monitoring
+      - monitoring
 
+  # ---------------------------------------------------------------------------
+  # API Gateway - Single entry point for all HTTP requests
+  # ---------------------------------------------------------------------------
   api-gateway:
     build:
       context: ./api-gateway
@@ -229,11 +246,9 @@ services:
 
     environment:
       - SERVER_PORT=4004
-#      - SPRING_CLOUD_GATEWAY_ROUTES_PATIENT_SERVICE_URI=http://patient-service:4000
-#      - SPRING_CLOUD_GATEWAY_ROUTES_BILLING_SERVICE_URI=http://billing-service:4001
 
     ports:
-      - "4004:4004"
+      - "4004:4004"  # ONLY external HTTP access point
 
     networks:
       - healthcare-network
@@ -253,21 +268,17 @@ services:
 # NETWORKS CONFIGURATION
 # =============================================================================
 networks:
-  internal:
-    external: {}
   healthcare-network:
-    external: {}
+    driver: bridge
 
 # =============================================================================
 # VOLUMES CONFIGURATION
 # =============================================================================
 volumes:
-  # Persistent storage for PostgreSQL data
   patient_db_data:
     driver: local
     name: patient_db_data
 
-  # Persistent storage for Kafka data
   kafka_data:
     driver: local
     name: kafka_data
@@ -276,22 +287,17 @@ volumes:
 # USAGE INSTRUCTIONS
 # =============================================================================
 #
+# All HTTP traffic now goes through API Gateway at http://localhost:4004
+#
+# Examples:
+#   - Patient API: http://localhost:4004/api/patients
+#   - Swagger Docs: http://localhost:4004/api-docs/patient-service
+#   - Kafka UI: http://localhost:8080 (with --profile monitoring)
+#
 # Start all services:
 #   docker-compose up -d
 #
 # Start with monitoring tools:
-#   docker-compose -f=docker-compose.yaml --profile monitoring up -d
-#
-# View logs:
-#   docker-compose logs -f [service-name]
-#
-# Scale services:
-#   docker-compose up -d --scale billing-service=2
-#
-# Stop all services:
-#   docker-compose down
-#
-# Clean up (including volumes):
-#   docker-compose down -v
+#   docker-compose --profile monitoring up -d
 #
 # =============================================================================

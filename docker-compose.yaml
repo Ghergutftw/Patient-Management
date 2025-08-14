@@ -1,21 +1,5 @@
-# =============================================================================
-# Healthcare Services - Docker Compose Configuration
-# =============================================================================
-# This configuration orchestrates a microservices architecture with:
-# - Patient Service (Spring Boot + PostgreSQL)
-# - Billing Service (gRPC enabled)
-# - Apache Kafka for event streaming
-# - API Gateway as the single entry point
-# - Internal network for secure service communication
-# =============================================================================
-
-# =============================================================================
-# SERVICES CONFIGURATION
-# =============================================================================
+# Option 1: Remove strict dependencies - Let API Gateway start independently
 services:
-  # ---------------------------------------------------------------------------
-  # Patient Service - Core patient management microservice
-  # ---------------------------------------------------------------------------
   patient-service:
     build:
       context: ./patient-service
@@ -23,46 +7,49 @@ services:
     image: patient-service:latest
     container_name: patient-service
     restart: unless-stopped
-
     environment:
-      # Server Configuration
-      - SERVER_PORT=4000
-
-      # Database Configuration
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://patient-service-db:5432/mydatabase
-      - SPRING_DATASOURCE_USERNAME=myuser
-      - SPRING_DATASOURCE_PASSWORD=secret
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
-      - SPRING_SQL_INIT_MODE=always
-
-      # External Service Configuration
-      - BILLING_SERVICE_ADDRESS=billing-service
-      - BILLING_SERVICE_GRPC_PORT=9001
-
-      # Kafka Configuration
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-
-    # REMOVED: ports section - no external access
-    # ports:
-    #   - "4000:4000"
-
+      SERVER_PORT: 4000
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-service-db:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_SQL_INIT_MODE: always
+      BILLING_SERVICE_ADDRESS: billing-service
+      BILLING_SERVICE_GRPC_PORT: 9001
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - healthcare-network
-
     depends_on:
-      - patient-service-db
-      - kafka
-
+      patient-service-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:4000/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 40s
+      start_period: 30s
 
-  # ---------------------------------------------------------------------------
-  # Analytics Service - Processes patient events from Kafka
-  # ---------------------------------------------------------------------------
+  patient-service-db:
+    image: postgres:15-alpine
+    container_name: patient-service-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes:
+      - patient_db_data:/var/lib/postgresql/data
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U myuser -d mydatabase" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   analytics-service:
     build:
       context: ./analytics-service
@@ -70,64 +57,71 @@ services:
     image: analytics-service:latest
     container_name: analytics-service
     restart: unless-stopped
-
     environment:
-      # Server Configuration
-      - SERVER_PORT=4002
-      # Kafka Configuration
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-
-    # REMOVED: ports section - no external access
-    # ports:
-    #   - "4002:4002"
-
+      SERVER_PORT: 4002
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - healthcare-network
-
     depends_on:
-      - kafka
-
+      kafka:
+        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:4002/actuator/health || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # ---------------------------------------------------------------------------
-  # Patient Database - PostgreSQL instance for patient data
-  # ---------------------------------------------------------------------------
-  patient-service-db:
-    image: postgres:15-alpine
-    container_name: patient-service-db
-    restart: unless-stopped
-
-    environment:
-      - POSTGRES_DB=mydatabase
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
-
-    volumes:
-      - patient_db_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
-
-    # REMOVED: ports section - database only accessible internally
-    # ports:
-    #   - "5432:5432"
-
-    networks:
-      - healthcare-network
-
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      test: ["CMD-SHELL", "curl -f http://localhost:4002/actuator/health || exit 1"]
       interval: 10s
       timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    image: auth-service:latest
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "8888:4005"
+    environment:
+      SERVER_PORT: 4005
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+      JWT_SECRET: oIubescPeBiancaMultMultMultMultMultMultMultMultMultMultMultMultMult
+    networks:
+      - healthcare-network
+    depends_on:
+      auth-service-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4003/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  auth-service-db:
+    image: postgres:15-alpine
+    container_name: auth-service-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes:
+      - auth_service_data:/var/lib/postgresql/data
+    networks:
+      - healthcare-network
+    ports:
+      - "4005:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U myuser -d mydatabase" ]
+      interval: 5s
+      timeout: 3s
       retries: 5
 
-  # ---------------------------------------------------------------------------
-  # Billing Service - Handles billing operations via gRPC
-  # ---------------------------------------------------------------------------
   billing-service:
     build:
       context: ./billing-service
@@ -135,107 +129,69 @@ services:
     image: billing-service:latest
     container_name: billing-service
     restart: unless-stopped
-
     environment:
-      # Service Configuration
-      - HTTP_PORT=4001
-      - GRPC_PORT=9001
-
-      # Kafka Configuration
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-
-    # REMOVED: HTTP port mapping - only gRPC exposed for internal communication
-    # Keep gRPC port if other services need direct access, or remove if going through gateway
-    ports:
-      - "9001:9001"  # gRPC - keep only if needed for direct service-to-service communication
-
+      HTTP_PORT: 4001
+      GRPC_PORT: 9001
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - healthcare-network
-
     depends_on:
-      - kafka
-
+      kafka:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "grpc_health_probe -addr=localhost:9001 || exit 1"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 40s
+      start_period: 30s
 
-  # ---------------------------------------------------------------------------
-  # Apache Kafka - Event streaming platform
-  # ---------------------------------------------------------------------------
   kafka:
     image: bitnami/kafka:latest
     container_name: kafka
     restart: unless-stopped
-
     environment:
-      # Kafka Cluster Configuration
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-
-      # Listener Configuration
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
-
-      # Topic Configuration
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_CFG_NUM_PARTITIONS=3
-      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
-
-      # Performance Tuning
-      - KAFKA_CFG_LOG_RETENTION_HOURS=168
-      - KAFKA_CFG_LOG_SEGMENT_BYTES=1073741824
-
-    # Keep external port for development/debugging - remove in production
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_CFG_NUM_PARTITIONS: 3
+      KAFKA_CFG_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_CFG_LOG_RETENTION_HOURS: 168
+      KAFKA_CFG_LOG_SEGMENT_BYTES: 1073741824
     ports:
-      - "9094:9094"  # External access for development tools
-
+      - "9094:9094"
     volumes:
       - kafka_data:/bitnami/kafka
-
     networks:
       - healthcare-network
-
     healthcheck:
       test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list"]
-      interval: 30s
-      timeout: 10s
+      interval: 15s
+      timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 45s
 
-  # ---------------------------------------------------------------------------
-  # Kafka UI (Optional) - Web interface for Kafka management
-  # ---------------------------------------------------------------------------
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     restart: unless-stopped
-
     environment:
-      - KAFKA_CLUSTERS_0_NAME=healthcare-cluster
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-
+      KAFKA_CLUSTERS_0_NAME: healthcare-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     ports:
-      - "8080:8080"  # Keep for development monitoring
-
+      - "8080:8080"
     networks:
       - healthcare-network
-
     depends_on:
-      - kafka
-
+      kafka:
+        condition: service_healthy
     profiles:
       - monitoring
 
-  # ---------------------------------------------------------------------------
-  # API Gateway - Single entry point for all HTTP requests
-  # ---------------------------------------------------------------------------
   api-gateway:
     build:
       context: ./api-gateway
@@ -243,61 +199,31 @@ services:
     image: api-gateway:latest
     container_name: api-gateway
     restart: unless-stopped
-
     environment:
-      - SERVER_PORT=4004
-
+      SERVER_PORT: 4004
     ports:
-      - "4004:4004"  # ONLY external HTTP access point
-
+      - "4004:4004"
     networks:
       - healthcare-network
-
     depends_on:
       - patient-service
       - billing-service
-
+      - auth-service
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:4004/actuator/health || exit 1"]
-      interval: 30s
+      test: ["CMD-SHELL", "curl -f http://localhost:4004/actuator/health || curl -f http://localhost:4004/health || exit 1"]
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      start_period: 60s
 
-# =============================================================================
-# NETWORKS CONFIGURATION
-# =============================================================================
 networks:
   healthcare-network:
     driver: bridge
 
-# =============================================================================
-# VOLUMES CONFIGURATION
-# =============================================================================
 volumes:
   patient_db_data:
     driver: local
-    name: patient_db_data
-
+  auth_service_data:
+    driver: local
   kafka_data:
     driver: local
-    name: kafka_data
-
-# =============================================================================
-# USAGE INSTRUCTIONS
-# =============================================================================
-#
-# All HTTP traffic now goes through API Gateway at http://localhost:4004
-#
-# Examples:
-#   - Patient API: http://localhost:4004/api/patients
-#   - Swagger Docs: http://localhost:4004/api-docs/patient-service
-#   - Kafka UI: http://localhost:8080 (with --profile monitoring)
-#
-# Start all services:
-#   docker-compose up -d
-#
-# Start with monitoring tools:
-#   docker-compose --profile monitoring up -d
-#
-# =============================================================================

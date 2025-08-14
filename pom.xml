@@ -22,6 +22,7 @@
         <module>api-gateway</module>
         <module>billing-service</module>
         <module>patient-service</module>
+        <module>auth-service</module>
     </modules>
 
 

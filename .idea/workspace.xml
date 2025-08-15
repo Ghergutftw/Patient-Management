@@ -4,29 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-API Gateway Single access">
-      <change afterPath="$PROJECT_DIR$/.run/auth-service [spring-boot_build-image].run.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.run/auth-service-db.run.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/config/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/controller/AuthController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/dto/LoginRequestDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/dto/LoginResponseDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/model/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/repository/UserRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/service/AuthService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/service/UserService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/java/com/pm/authservice/util/JwtUtil.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/auth-service/src/main/resources/data.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/billing-service/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Auth Service with JWT">
+      <change afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/pm/apigateway/filter/JwtValidationGatewayFilterFactory.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.run/build-images.run.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.run/build-images.run.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.run/patient-service-db.run.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.run/patient-service-db.run.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compose.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -161,6 +143,7 @@
     "JavaScript Debug.patient.html.executor": "Run",
     "Maven.analytics-service [org.springframework.boot:spring-boot-maven-plugin:3.4.1:build-image].executor": "Run",
     "Maven.analytics-service [spring-boot:build-image].executor": "Run",
+    "Maven.api-gateway [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image-no-fork].executor": "Run",
     "Maven.api-gateway [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image].executor": "Run",
     "Maven.api-gateway [org.springframework.boot:spring-boot-maven-plugin:3.5.4:build-image].executor": "Run",
     "Maven.api-gateway [spring-boot:build-image].executor": "Run",
@@ -396,10 +379,10 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.auth-service-db: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.patient-service: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.patient-service-db: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
         <item itemvalue="JUnit.All in patient-service" />
       </list>
     </recent_temporary>
@@ -446,7 +429,7 @@
       <workItem from="1754691982125" duration="4216000" />
       <workItem from="1754771889308" duration="7335000" />
       <workItem from="1755173973892" duration="5882000" />
-      <workItem from="1755208576990" duration="5257000" />
+      <workItem from="1755208576990" duration="8558000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -488,7 +471,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754778986211</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="-Auth Service with JWT">
+      <option name="closed" value="true" />
+      <created>1755214280313</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755214280313</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -512,7 +503,8 @@
     <MESSAGE value="-Docker image creating&#10;-Pushing to nexus&#10;-Learned How to docker using Intellij&#10;-Understood how to validate request&#10;-Enchants the README.md" />
     <MESSAGE value="-Making a docker image&#10;-Learning how to make a docker network and how to use it&#10;-How to bind port and use env variables while running" />
     <MESSAGE value="-API Gateway" />
-    <option name="LAST_COMMIT_MESSAGE" value="-API Gateway" />
+    <MESSAGE value="-Auth Service with JWT" />
+    <option name="LAST_COMMIT_MESSAGE" value="-Auth Service with JWT" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -79,8 +79,6 @@ services:
     image: auth-service:latest
     container_name: auth-service
     restart: unless-stopped
-    ports:
-      - "8888:4005"
     environment:
       SERVER_PORT: 4005
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/mydatabase
@@ -114,8 +112,6 @@ services:
       - auth_service_data:/var/lib/postgresql/data
     networks:
       - healthcare-network
-    ports:
-      - "4005:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U myuser -d mydatabase" ]
       interval: 5s
@@ -162,8 +158,6 @@ services:
       KAFKA_CFG_DEFAULT_REPLICATION_FACTOR: 1
       KAFKA_CFG_LOG_RETENTION_HOURS: 168
       KAFKA_CFG_LOG_SEGMENT_BYTES: 1073741824
-    ports:
-      - "9094:9094"
     volumes:
       - kafka_data:/bitnami/kafka
     networks:
@@ -201,6 +195,18 @@ services:
     restart: unless-stopped
     environment:
       SERVER_PORT: 4004
+      # Enable maximum logging
+      LOGGING_LEVEL_ROOT: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CLOUD_GATEWAY: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_REACTIVE: DEBUG
+      LOGGING_LEVEL_REACTOR_NETTY: DEBUG
+      LOGGING_LEVEL_REACTOR_NETTY_HTTP_SERVER: DEBUG
+      LOGGING_LEVEL_REACTOR_NETTY_HTTP_CLIENT: DEBUG
+      SPRING_CLOUD_GATEWAY_HTTPSERVER_WIRETAP: "true"
+      SPRING_CLOUD_GATEWAY_HTTPCLIENT_WIRETAP: "true"
+
+      AUTH_SERVICE_URL: http://auth-service:4005
     ports:
       - "4004:4004"
     networks:

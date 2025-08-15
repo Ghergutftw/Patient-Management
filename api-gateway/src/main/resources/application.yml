@@ -9,122 +9,86 @@ spring:
       server:
         webflux:
           routes:
-            # =============================================
-                    # PATIENT SERVICE ROUTES
-                    # =============================================
-                    - id: patient-service-route
-                      uri: http://patient-service:4000
-                      predicates:
-                        - Path=/api/patients/**  # FIXED: Added /** to match all subpaths
-                      filters:
-                        - StripPrefix=1
-                        # http://localhost:4004/api/patients/123 -> http://patient-service:4000/patients/123
+            - id: auth-service-route
+              uri: http://auth-service:4005
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - StripPrefix=2
 
-                    - id: patient-service-root
-                      uri: http://patient-service:4000
-                      predicates:
-                        - Path=/api/patients  # Handle exact match without trailing slash
-                      filters:
-                        - StripPrefix=1
+            - id: patient-service-route
+              uri: http://patient-service:4000
+              predicates:
+                - Path=/api/patients/**
+              filters:
+                - StripPrefix=1
+                - JwtValidation
 
-                    - id: api-docs-patient-route
-                      uri: http://patient-service:4000
-                      predicates:
-                        - Path=/api-docs/patient-service/**
-                      filters:
-                        - RewritePath=/api-docs/patient-service/(?<segment>.*), /v3/api-docs/${segment}
-                        - RewritePath=/api-docs/patient-service, /v3/api-docs
+            - id: api-docs-patient-route
+              uri: http://patient-service:4000
+              predicates:
+                - Path=/api-docs/patient-service/**
+              filters:
+                - RewritePath=/api-docs/patient-service/(?<segment>.*), /v3/api-docs/${segment}
+                - RewritePath=/api-docs/patient-service, /v3/api-docs
 
-                    - id: api-docs-patient-root
-                      uri: http://patient-service:4000
-                      predicates:
-                        - Path=/api-docs/patient-service
-                      filters:
-                        - RewritePath=/api-docs/patient-service, /v3/api-docs
+            - id: api-docs-patient-root
+              uri: http://patient-service:4000
+              predicates:
+                - Path=/api-docs/patient-service
+              filters:
+                - RewritePath=/api-docs/patient-service, /v3/api-docs
 
-                    # =============================================
-                    # BILLING SERVICE ROUTES
-                    # =============================================
-                    - id: billing-service-route
-                      uri: http://billing-service:4001
-                      predicates:
-                        - Path=/api/billing/**
-                      filters:
-                        - StripPrefix=1
+            - id: billing-service-route
+              uri: http://billing-service:4001
+              predicates:
+                - Path=/api/billing/**
+              filters:
+                - StripPrefix=1
 
-                    - id: billing-service-root
-                      uri: http://billing-service:4001
-                      predicates:
-                        - Path=/api/billing
-                      filters:
-                        - StripPrefix=1
+            - id: billing-service-root
+              uri: http://billing-service:4001
+              predicates:
+                - Path=/api/billing
+              filters:
+                - StripPrefix=1
 
-                    # =============================================
-                    # ANALYTICS SERVICE ROUTES
-                    # =============================================
-                    - id: analytics-service-route
-                      uri: http://analytics-service:4002
-                      predicates:
-                        - Path=/api/analytics/**
-                      filters:
-                        - StripPrefix=1
+            - id: analytics-service-route
+              uri: http://analytics-service:4002
+              predicates:
+                - Path=/api/analytics/**
+              filters:
+                - StripPrefix=1
 
-                    - id: analytics-service-root
-                      uri: http://analytics-service:4002
-                      predicates:
-                        - Path=/api/analytics
-                      filters:
-                        - StripPrefix=1
+            - id: analytics-service-root
+              uri: http://analytics-service:4002
+              predicates:
+                - Path=/api/analytics
+              filters:
+                - StripPrefix=1
 
-                    # =============================================
-                    # HEALTH CHECK ROUTES
-                    # =============================================
-                    - id: patient-health
-                      uri: http://patient-service:4000
-                      predicates:
-                        - Path=/health/patient/**
-                      filters:
-                        - RewritePath=/health/patient/(?<segment>.*), /actuator/${segment}
+            - id: patient-health
+              uri: http://patient-service:4000
+              predicates:
+                - Path=/health/patient/**
+              filters:
+                - RewritePath=/health/patient/(?<segment>.*), /actuator/${segment}
 
-                    - id: billing-health
-                      uri: http://billing-service:4001
-                      predicates:
-                        - Path=/health/billing/**
-                      filters:
-                        - RewritePath=/health/billing/(?<segment>.*), /actuator/${segment}
+            - id: billing-health
+              uri: http://billing-service:4001
+              predicates:
+                - Path=/health/billing/**
+              filters:
+                - RewritePath=/health/billing/(?<segment>.*), /actuator/${segment}
 
-                    - id: analytics-health
-                      uri: http://analytics-service:4002
-                      predicates:
-                        - Path=/health/analytics/**
-                      filters:
-                        - RewritePath=/health/analytics/(?<segment>.*), /actuator/${segment}
+            - id: analytics-health
+              uri: http://analytics-service:4002
+              predicates:
+                - Path=/health/analytics/**
+              filters:
+                - RewritePath=/health/analytics/(?<segment>.*), /actuator/${segment}
 
-                    # =============================================
-                    # GATEWAY ACTUATOR
-                    # =============================================
-                    - id: gateway-actuator
-                      uri: http://localhost:4004
-                      predicates:
-                        - Path=/actuator/**
-
-# =============================================
-# LOGGING FOR DEBUGGING
-# =============================================
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.web.reactive: DEBUG
-    reactor.netty.http.client: DEBUG
-
-# =============================================
-# MANAGEMENT ENDPOINTS
-# =============================================
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,gateway,routes
-  endpoint:
-    health:
-      show-details: always
+            - id: gateway-actuator
+              uri: http://localhost:4004
+              predicates:
+                - Path=/actuator/**

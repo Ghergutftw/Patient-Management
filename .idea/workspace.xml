@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Auth Service with JWT">
-      <change afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/pm/apigateway/filter/JwtValidationGatewayFilterFactory.java" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-API Gateway with Auth Service&#10;-Global Exception Handler">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,8 +38,8 @@
         <option value="OpenRewrite Recipe" />
         <option value="Dockerfile" />
         <option value="HTTP Request" />
-        <option value="Class" />
         <option value="com.intellij.jpb.JpaRepository" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -429,7 +427,7 @@
       <workItem from="1754691982125" duration="4216000" />
       <workItem from="1754771889308" duration="7335000" />
       <workItem from="1755173973892" duration="5882000" />
-      <workItem from="1755208576990" duration="8558000" />
+      <workItem from="1755208576990" duration="8940000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -479,7 +477,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755214280313</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="-API Gateway with Auth Service&#10;-Global Exception Handler">
+      <option name="closed" value="true" />
+      <created>1755217617679</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1755217617679</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -504,7 +510,8 @@
     <MESSAGE value="-Making a docker image&#10;-Learning how to make a docker network and how to use it&#10;-How to bind port and use env variables while running" />
     <MESSAGE value="-API Gateway" />
     <MESSAGE value="-Auth Service with JWT" />
-    <option name="LAST_COMMIT_MESSAGE" value="-Auth Service with JWT" />
+    <MESSAGE value="-API Gateway with Auth Service&#10;-Global Exception Handler" />
+    <option name="LAST_COMMIT_MESSAGE" value="-API Gateway with Auth Service&#10;-Global Exception Handler" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-API Gateway with Auth Service&#10;-Global Exception Handler">
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Auth Docs">
+      <change afterPath="$PROJECT_DIR$/integration-tests/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/integration-tests/src/test/java/AuthIntegrationTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/integration-tests/src/test/java/PatientIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -191,6 +194,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/integration-tests/src/main/java/com/pm/Main.java",
     "project.structure.last.edited": "Global Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2689655",
@@ -233,11 +237,22 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Docker.TheApp">
-    <configuration name="All in patient-service" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="patient-service" />
+  <component name="RunManager" selected="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken">
+    <configuration name="AuthIntegrationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="integration-tests" />
       <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
+      <option name="MAIN_CLASS_NAME" value="AuthIntegrationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PatientIntegrationTest.shouldReturnPatientsWithValidToken" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="integration-tests" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="PatientIntegrationTest" />
+      <option name="METHOD_NAME" value="shouldReturnPatientsWithValidToken" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -323,19 +338,6 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker-compose.yaml.patient-service-db: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="patient-service-db" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="docker-compose.yaml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
     <configuration name="docker-compose.yaml.patient-service: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
@@ -362,8 +364,8 @@
       <item itemvalue="Docker.docker-compose.yaml.auth-service-db: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yaml.patient-service: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
-      <item itemvalue="Docker.docker-compose.yaml.patient-service-db: Compose Deployment" />
-      <item itemvalue="JUnit.All in patient-service" />
+      <item itemvalue="JUnit.AuthIntegrationTest" />
+      <item itemvalue="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken" />
       <item itemvalue="Maven.auth-service [spring-boot:build-image]" />
       <item itemvalue="Maven.analytics-service [spring-boot:build-image]" />
       <item itemvalue="Maven.api-gateway [spring-boot:build-image]" />
@@ -377,11 +379,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken" />
+        <item itemvalue="JUnit.AuthIntegrationTest" />
         <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.auth-service-db: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.patient-service: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yaml.patient-service-db: Compose Deployment" />
-        <item itemvalue="JUnit.All in patient-service" />
       </list>
     </recent_temporary>
   </component>
@@ -427,7 +429,8 @@
       <workItem from="1754691982125" duration="4216000" />
       <workItem from="1754771889308" duration="7335000" />
       <workItem from="1755173973892" duration="5882000" />
-      <workItem from="1755208576990" duration="8940000" />
+      <workItem from="1755208576990" duration="9316000" />
+      <workItem from="1755274337034" duration="1986000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -485,7 +488,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755217617679</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="-Auth Docs">
+      <option name="closed" value="true" />
+      <created>1755217854902</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1755217854902</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -511,7 +522,19 @@
     <MESSAGE value="-API Gateway" />
     <MESSAGE value="-Auth Service with JWT" />
     <MESSAGE value="-API Gateway with Auth Service&#10;-Global Exception Handler" />
-    <option name="LAST_COMMIT_MESSAGE" value="-API Gateway with Auth Service&#10;-Global Exception Handler" />
+    <MESSAGE value="-Auth Docs" />
+    <option name="LAST_COMMIT_MESSAGE" value="-Auth Docs" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/integration-tests/src/main/java/com/pm/Main.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

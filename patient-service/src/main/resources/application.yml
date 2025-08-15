@@ -49,3 +49,22 @@ server:
   port: ${patient.service.port}
   http2:
     enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    enable:
+      kafka: true
+    tags:
+      application: patient-service # change per service
+      environment: dev
+  prometheus:
+    metrics:
+      export:
+        enabled: true

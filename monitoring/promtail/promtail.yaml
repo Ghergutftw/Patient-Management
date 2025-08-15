@@ -1,0 +1,44 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Docker container logs with better labeling
+  - job_name: docker-containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+
+    relabel_configs:
+      # Container name
+      - source_labels: [__meta_docker_container_name]
+        target_label: container_name
+        regex: /(.*?)
+        replacement: ${1}
+
+      # Service name from docker-compose
+      - source_labels: [__meta_docker_container_label_com_docker_compose_service]
+        target_label: job
+        regex: (.*)
+        replacement: ${1}
+
+      # Project name from docker-compose
+      - source_labels: [__meta_docker_container_label_com_docker_compose_project]
+        target_label: project
+        regex: (.*)
+        replacement: ${1}
+
+      # Log path
+      - source_labels: [__meta_docker_container_log_path]
+        target_label: __path__
+
+      # Only scrape healthcare services
+      - source_labels: [__meta_docker_container_label_com_docker_compose_service]
+        regex: (patient-service|billing-service|analytics-service|auth-service|api-gateway)
+        action: keep

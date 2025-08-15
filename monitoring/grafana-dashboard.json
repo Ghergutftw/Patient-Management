@@ -1,0 +1,104 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Spring Boot Services Metrics",
+      "gridPos": {"x":0,"y":0,"w":24,"h":1},
+      "id": 1
+    },
+    {
+      "type": "graph",
+      "title": "CPU Usage (Java Services)",
+      "targets": [
+        {
+          "expr": "process_cpu_seconds_total{job=~\"patient-service|billing-service|analytics-service|auth-service|api-gateway\"}",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":0,"y":1,"w":12,"h":6},
+      "id": 2
+    },
+    {
+      "type": "graph",
+      "title": "Memory Usage (Java Services)",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{job=~\"patient-service|billing-service|analytics-service|auth-service|api-gateway\"}",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":12,"y":1,"w":12,"h":6},
+      "id": 3
+    },
+    {
+      "type": "row",
+      "title": "Kafka Metrics",
+      "gridPos": {"x":0,"y":7,"w":24,"h":1},
+      "id": 4
+    },
+    {
+      "type": "graph",
+      "title": "Kafka Messages In",
+      "targets": [
+        {
+          "expr": "kafka_server_brokertopicmetrics_messagesin_total",
+          "legendFormat": "{{topic}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":0,"y":8,"w":12,"h":6},
+      "id": 5
+    },
+    {
+      "type": "graph",
+      "title": "Kafka Bytes In/Out",
+      "targets": [
+        {
+          "expr": "kafka_server_brokertopicmetrics_bytesin_total",
+          "legendFormat": "{{topic}} Bytes In",
+          "refId": "A"
+        },
+        {
+          "expr": "kafka_server_brokertopicmetrics_bytesout_total",
+          "legendFormat": "{{topic}} Bytes Out",
+          "refId": "B"
+        }
+      ],
+      "gridPos": {"x":12,"y":8,"w":12,"h":6},
+      "id": 6
+    },
+    {
+      "type": "row",
+      "title": "Logs",
+      "gridPos": {"x":0,"y":14,"w":24,"h":1},
+      "id": 7
+    },
+    {
+      "type": "logs",
+      "title": "Application Logs (via Loki)",
+      "targets": [
+        {
+          "expr": "{job=~\"patient-service|billing-service|analytics-service|auth-service|api-gateway\"}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":0,"y":15,"w":24,"h":6},
+      "id": 8
+    }
+  ],
+  "schemaVersion": 36,
+  "title": "Healthcare Microservices Dashboard V0",
+  "version": 1,
+  "refresh": "10s"
+}

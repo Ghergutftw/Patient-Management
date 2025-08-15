@@ -1,0 +1,166 @@
+{
+  "panels": [
+    {
+      "type": "row",
+      "title": "Per-Service Metrics",
+      "gridPos": {"x":0,"y":51,"w":24,"h":1},
+      "id": 50,
+      "collapsed": false
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Usage (%) - Patient Service",
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{job='patient-service'}[5m])*100",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":0,"y":52,"w":8,"h":6},
+      "id": 51
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Heap Usage - Patient Service",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area='heap',job='patient-service'}",
+          "legendFormat": "{{instance}}-Used",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{area='heap',job='patient-service'}",
+          "legendFormat": "{{instance}}-Max",
+          "refId": "B"
+        }
+      ],
+      "gridPos": {"x":8,"y":52,"w":8,"h":6},
+      "id": 52
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Usage (%) - Billing Service",
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{job='billing-service'}[5m])*100",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":16,"y":52,"w":8,"h":6},
+      "id": 53
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Heap Usage - Billing Service",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area='heap',job='billing-service'}",
+          "legendFormat": "{{instance}}-Used",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{area='heap',job='billing-service'}",
+          "legendFormat": "{{instance}}-Max",
+          "refId": "B"
+        }
+      ],
+      "gridPos": {"x":0,"y":58,"w":8,"h":6},
+      "id": 54
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Usage (%) - Analytics Service",
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{job='analytics-service'}[5m])*100",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":8,"y":58,"w":8,"h":6},
+      "id": 55
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Heap Usage - Analytics Service",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area='heap',job='analytics-service'}",
+          "legendFormat": "{{instance}}-Used",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{area='heap',job='analytics-service'}",
+          "legendFormat": "{{instance}}-Max",
+          "refId": "B"
+        }
+      ],
+      "gridPos": {"x":16,"y":58,"w":8,"h":6},
+      "id": 56
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Usage (%) - Auth Service",
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{job='auth-service'}[5m])*100",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":0,"y":64,"w":8,"h":6},
+      "id": 57
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Heap Usage - Auth Service",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area='heap',job='auth-service'}",
+          "legendFormat": "{{instance}}-Used",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{area='heap',job='auth-service'}",
+          "legendFormat": "{{instance}}-Max",
+          "refId": "B"
+        }
+      ],
+      "gridPos": {"x":8,"y":64,"w":8,"h":6},
+      "id": 58
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Usage (%) - API Gateway",
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{job='api-gateway'}[5m])*100",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {"x":16,"y":64,"w":8,"h":6},
+      "id": 59
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Heap Usage - API Gateway",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area='heap',job='api-gateway'}",
+          "legendFormat": "{{instance}}-Used",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{area='heap',job='api-gateway'}",
+          "legendFormat": "{{instance}}-Max",
+          "refId": "B"
+        }
+      ],
+      "gridPos": {"x":0,"y":70,"w":8,"h":6},
+      "id": 60
+    }
+  ]
+}

@@ -4,17 +4,48 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-Auth Docs">
-      <change afterPath="$PROJECT_DIR$/integration-tests/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/integration-tests/src/test/java/AuthIntegrationTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/integration-tests/src/test/java/PatientIntegrationTest.java" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-LocalStack for cloud">
+      <change afterPath="$PROJECT_DIR$/.run/LocalStack.run.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application-prod.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/infrastructure/localstack-deploy.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/infrastructure/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/infrastructure/src/main/java/com/pm/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/infrastructure/src/main/java/com/pm/stack/LocalStack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/grafana-dashboard.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/dashboards.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/healthcare-dashboard.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/simple-dashboard.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/datasources/datasources.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/loki/loki-config.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/prometheus/prometheus.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/promtail/promtail.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analytics-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/analytics-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analytics-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/analytics-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/billing-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/billing-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/billing-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/billing-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DockerExecCommands">
+    <ExecCommand>
+      <option name="command" value="curl -f http://localhost:4000/actuator/health" />
+    </ExecCommand>
+    <ExecCommand>
+      <option name="command" value="wget -qO- http://localhost:4000/actuator/health" />
+    </ExecCommand>
   </component>
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
@@ -118,6 +149,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.LocalStack.executor": "Run",
     "Docker.Docker Image (1).executor": "Run",
     "Docker.Docker Image.executor": "Run",
     "Docker.TheApp.executor": "Run",
@@ -129,6 +161,7 @@
     "Docker.compose.yaml.postgres: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yaml.api-gateway: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yaml.auth-service-db: Compose Deployment.executor": "Run",
+    "Docker.docker-compose.yaml.loki: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yaml.patient-service-db: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yaml.patient-service: Compose Deployment.executor": "Run",
     "Docker.kafka.executor": "Run",
@@ -141,7 +174,11 @@
     "HTTP Request.generated-requests | #3.executor": "Run",
     "HTTP Request.generated-requests | Get all patients.executor": "Run",
     "JUnit.All in patient-service.executor": "Debug",
+    "JUnit.AuthIntegrationTest.executor": "Run",
+    "JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken.executor": "Run",
     "JavaScript Debug.patient.html.executor": "Run",
+    "Maven.analytics-service [compile].executor": "Run",
+    "Maven.analytics-service [install].executor": "Run",
     "Maven.analytics-service [org.springframework.boot:spring-boot-maven-plugin:3.4.1:build-image].executor": "Run",
     "Maven.analytics-service [spring-boot:build-image].executor": "Run",
     "Maven.api-gateway [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image-no-fork].executor": "Run",
@@ -151,13 +188,17 @@
     "Maven.auth-service [org.springframework.boot:spring-boot-maven-plugin:3.5.0:build-image].executor": "Run",
     "Maven.auth-service [spring-boot:build-image].executor": "Run",
     "Maven.billing-service [clean,package].executor": "Run",
+    "Maven.billing-service [clean].executor": "Run",
     "Maven.billing-service [compile].executor": "Run",
+    "Maven.billing-service [install].executor": "Run",
     "Maven.billing-service [org.springframework.boot:spring-boot-maven-plugin:3.5.4:build-image].executor": "Run",
     "Maven.billing-service [package].executor": "Run",
     "Maven.billing-service [spring-boot:build-image].executor": "Run",
     "Maven.billing-service [validate].executor": "Run",
+    "Maven.integration-tests [compile].executor": "Run",
     "Maven.patient-management-parent [clean,package].executor": "Run",
     "Maven.patient-management-parent [clean].executor": "Run",
+    "Maven.patient-management-parent [org.apache.maven.plugins:maven-install-plugin:3.1.4:install].executor": "Run",
     "Maven.patient-service [clean,package].executor": "Run",
     "Maven.patient-service [clean].executor": "Run",
     "Maven.patient-service [compile].executor": "Run",
@@ -188,13 +229,13 @@
     "database.data.extractors.current.id": "HTML-Groovy.html.groovy",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/billing-service",
+    "last_opened_file_path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/monitoring/grafana/provisioning/dashboards",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/integration-tests/src/main/java/com/pm/Main.java",
+    "onboarding.tips.debug.path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/infrastructure/src/main/java/com/pm/Main.java",
     "project.structure.last.edited": "Global Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2689655",
@@ -216,6 +257,7 @@
       <recent name="app.exception" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\monitoring\grafana\provisioning\dashboards" />
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\billing-service" />
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\api-gateway" />
       <recent name="C:\Users\madal\Desktop\Files\Projects\patient-managment\patient-service\src" />
@@ -237,7 +279,13 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken">
+  <component name="RunManager" selected="Docker.TheApp">
+    <configuration default="true" type="Application" factoryName="Application">
+      <shortenClasspath name="ARGS_FILE" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="AuthIntegrationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="integration-tests" />
       <option name="PACKAGE_NAME" value="" />
@@ -325,12 +373,12 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker-compose.yaml.auth-service-db: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+    <configuration name="docker-compose.yaml.loki: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
           <option name="services">
             <list>
-              <option value="auth-service-db" />
+              <option value="loki" />
             </list>
           </option>
           <option name="sourceFilePath" value="docker-compose.yaml" />
@@ -352,6 +400,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Application.LocalStack" />
       <item itemvalue="Compound.build-images" />
       <item itemvalue="Docker.analytics-service" />
       <item itemvalue="Docker.kafka" />
@@ -361,7 +410,7 @@
       <item itemvalue="Docker.patient-service" />
       <item itemvalue="Docker.billing-service" />
       <item itemvalue="Docker.TheApp" />
-      <item itemvalue="Docker.docker-compose.yaml.auth-service-db: Compose Deployment" />
+      <item itemvalue="Docker.docker-compose.yaml.loki: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yaml.patient-service: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
       <item itemvalue="JUnit.AuthIntegrationTest" />
@@ -379,11 +428,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken" />
-        <item itemvalue="JUnit.AuthIntegrationTest" />
+        <item itemvalue="Docker.docker-compose.yaml.loki: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yaml.auth-service-db: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.patient-service: Compose Deployment" />
+        <item itemvalue="Application.LocalStack" />
+        <item itemvalue="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken" />
       </list>
     </recent_temporary>
   </component>
@@ -430,7 +479,8 @@
       <workItem from="1754771889308" duration="7335000" />
       <workItem from="1755173973892" duration="5882000" />
       <workItem from="1755208576990" duration="9316000" />
-      <workItem from="1755274337034" duration="1986000" />
+      <workItem from="1755274337034" duration="15856000" />
+      <workItem from="1755295111518" duration="5545000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -496,7 +546,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755217854902</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="-Rest testing with RestAssured">
+      <option name="closed" value="true" />
+      <created>1755277579949</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1755277579950</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -523,7 +581,9 @@
     <MESSAGE value="-Auth Service with JWT" />
     <MESSAGE value="-API Gateway with Auth Service&#10;-Global Exception Handler" />
     <MESSAGE value="-Auth Docs" />
-    <option name="LAST_COMMIT_MESSAGE" value="-Auth Docs" />
+    <MESSAGE value="-Rest testing with RestAssured" />
+    <MESSAGE value="-LocalStack for cloud" />
+    <option name="LAST_COMMIT_MESSAGE" value="-LocalStack for cloud" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -532,6 +592,11 @@
           <url>file://$PROJECT_DIR$/integration-tests/src/main/java/com/pm/Main.java</url>
           <line>13</line>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/infrastructure/src/main/java/com/pm/Main.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

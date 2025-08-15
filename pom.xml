@@ -25,6 +25,14 @@
         <module>auth-service</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+    </dependencies>
+
 
     <properties>
         <patient.service.port>4000</patient.service.port>

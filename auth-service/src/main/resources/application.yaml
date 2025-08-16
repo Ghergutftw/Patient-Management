@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: auth-service
+
+server:
+  port: 4005
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    enable:
+      kafka: true
+    tags:
+      application: auth-service
+      environment: dev
+  prometheus:
+    metrics:
+      export:
+        enabled: true

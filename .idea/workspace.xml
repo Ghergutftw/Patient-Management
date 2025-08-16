@@ -5,34 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="-LocalStack for cloud">
-      <change afterPath="$PROJECT_DIR$/.run/LocalStack.run.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application-prod.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infrastructure/localstack-deploy.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infrastructure/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infrastructure/src/main/java/com/pm/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infrastructure/src/main/java/com/pm/stack/LocalStack.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/grafana-dashboard.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/dashboards.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/healthcare-dashboard.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/simple-dashboard.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/datasources/datasources.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/loki/loki-config.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/prometheus/prometheus.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/monitoring/promtail/promtail.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/monitoring/tempo/tempo.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analytics-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/analytics-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analytics-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/analytics-service/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/billing-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/billing-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/billing-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/billing-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auth-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/billing-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/billing-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/loki/loki-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring/loki/loki-config.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,6 +141,7 @@
     "Docker.docker-compose.yaml.loki: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yaml.patient-service-db: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yaml.patient-service: Compose Deployment.executor": "Run",
+    "Docker.docker-compose.yaml.tempo: Compose Deployment.executor": "Run",
     "Docker.kafka.executor": "Run",
     "Docker.patient-service-db.executor": "Run",
     "Docker.patient-service.executor": "Run",
@@ -286,15 +264,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AuthIntegrationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="integration-tests" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="AuthIntegrationTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="PatientIntegrationTest.shouldReturnPatientsWithValidToken" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="integration-tests" />
       <option name="PACKAGE_NAME" value="" />
@@ -399,6 +368,19 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="docker-compose.yaml.tempo: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="tempo" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yaml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Application.LocalStack" />
       <item itemvalue="Compound.build-images" />
@@ -410,10 +392,10 @@
       <item itemvalue="Docker.patient-service" />
       <item itemvalue="Docker.billing-service" />
       <item itemvalue="Docker.TheApp" />
+      <item itemvalue="Docker.docker-compose.yaml.tempo: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yaml.loki: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yaml.patient-service: Compose Deployment" />
       <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
-      <item itemvalue="JUnit.AuthIntegrationTest" />
       <item itemvalue="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken" />
       <item itemvalue="Maven.auth-service [spring-boot:build-image]" />
       <item itemvalue="Maven.analytics-service [spring-boot:build-image]" />
@@ -428,11 +410,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yaml.tempo: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.loki: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.api-gateway: Compose Deployment" />
         <item itemvalue="Docker.docker-compose.yaml.patient-service: Compose Deployment" />
         <item itemvalue="Application.LocalStack" />
-        <item itemvalue="JUnit.PatientIntegrationTest.shouldReturnPatientsWithValidToken" />
       </list>
     </recent_temporary>
   </component>
@@ -481,6 +463,7 @@
       <workItem from="1755208576990" duration="9316000" />
       <workItem from="1755274337034" duration="15856000" />
       <workItem from="1755295111518" duration="5545000" />
+      <workItem from="1755373049563" duration="3281000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />

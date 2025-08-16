@@ -1,0 +1,27 @@
+server:
+  http_listen_port: 3101
+  grpc_listen_port: 3200
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tempo/traces
+
+compactor:
+  compaction:
+    block_retention: 24h

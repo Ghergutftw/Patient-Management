@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: billing-service
+
+server:
+  port: 4001
+  http2:
+    enabled: true
+
+grpc:
+  server:
+    port: 9001
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    enable:
+      kafka: true
+    tags:
+      application: billing-service
+      environment: dev
+  prometheus:
+    metrics:
+      export:
+        enabled: true

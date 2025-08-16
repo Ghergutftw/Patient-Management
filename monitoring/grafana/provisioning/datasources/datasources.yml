@@ -3,13 +3,34 @@ apiVersion: 1
 datasources:
   - name: Prometheus
     type: prometheus
+    uid: prometheus-uid        # Added explicit UID
     access: proxy
     url: http://prometheus:9090
     isDefault: true
     editable: true
+    jsonData:
+      httpMethod: POST
+      queryTimeout: 60s
+      timeInterval: 15s
 
   - name: Loki
     type: loki
-    access: proxy
+    uid: loki-uid             # Keep your existing UID
     url: http://loki:3100
+    access: proxy
+    isDefault: false
+    version: 1
     editable: true
+    jsonData:
+      maxLines: 1000
+      timeout: 60
+      derivedFields:
+        - datasourceUid: prometheus-uid  # Now matches the Prometheus UID above
+          matcherRegex: 'traceID=(\w+)'
+          name: TraceID
+          url: '$${__value.raw}'
+          # Optional: Add more derived fields for better log correlation
+        - datasourceUid: prometheus-uid
+          matcherRegex: 'requestId=(\w+)'
+          name: RequestID
+          url: '$${__value.raw}'

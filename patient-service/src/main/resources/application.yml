@@ -44,6 +44,8 @@ springdoc:
 logging:
   level:
     root: info
+  pattern:
+    correlation: "[${spring.application.name},%X{traceId:-},%X{spanId:-}]"
 
 server:
   port: ${patient.service.port}
@@ -59,6 +61,9 @@ management:
     health:
       show-details: always
   metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
     enable:
       kafka: true
     tags:
@@ -68,3 +73,7 @@ management:
     metrics:
       export:
         enabled: true
+  observations:
+    key-values:
+      application: patient-service
+

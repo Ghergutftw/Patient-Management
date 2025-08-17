@@ -1,11 +1,8 @@
 services:
   patient-service:
-    build:
-      context: ./patient-service
-      dockerfile: Dockerfile
     image: patient-service:latest
     container_name: patient-service
-    restart: unless-stopped
+    restart: no
     environment:
       SERVER_PORT: 4000
       SPRING_DATASOURCE_URL: jdbc:postgresql://patient-service-db:5432/mydatabase
@@ -37,7 +34,7 @@ services:
   patient-service-db:
     image: postgres:15-alpine
     container_name: patient-service-db
-    restart: unless-stopped
+    restart: no
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
@@ -54,12 +51,9 @@ services:
       retries: 5
 
   analytics-service:
-    build:
-      context: ./analytics-service
-      dockerfile: Dockerfile
     image: analytics-service:latest
     container_name: analytics-service
-    restart: unless-stopped
+    restart: no
     environment:
       SERVER_PORT: 4002
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -76,12 +70,9 @@ services:
       start_period: 30s
 
   auth-service:
-    build:
-      context: ./auth-service
-      dockerfile: Dockerfile
     image: auth-service:latest
     container_name: auth-service
-    restart: unless-stopped
+    restart: no
     environment:
       SERVER_PORT: 4005
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/mydatabase
@@ -105,7 +96,7 @@ services:
   auth-service-db:
     image: postgres:15-alpine
     container_name: auth-service-db
-    restart: unless-stopped
+    restart: no
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
@@ -122,12 +113,9 @@ services:
       retries: 5
 
   billing-service:
-    build:
-      context: ./billing-service
-      dockerfile: Dockerfile
     image: billing-service:latest
     container_name: billing-service
-    restart: unless-stopped
+    restart: no
     environment:
       HTTP_PORT: 4001
       GRPC_PORT: 9001
@@ -147,7 +135,7 @@ services:
   kafka:
     image: bitnami/kafka:latest
     container_name: kafka
-    restart: unless-stopped
+    restart: no
     environment:
       KAFKA_CFG_NODE_ID: 0
       KAFKA_CFG_PROCESS_ROLES: controller,broker
@@ -175,7 +163,7 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
-    restart: unless-stopped
+    restart: no
     environment:
       KAFKA_CLUSTERS_0_NAME: healthcare-cluster
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
@@ -190,12 +178,9 @@ services:
       - monitoring
 
   api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
     image: api-gateway:latest
     container_name: api-gateway
-    restart: unless-stopped
+    restart: no
     environment:
       SERVER_PORT: 4004
       LOGGING_LEVEL_ROOT: DEBUG
@@ -208,6 +193,7 @@ services:
       SPRING_CLOUD_GATEWAY_HTTPSERVER_WIRETAP: "true"
       SPRING_CLOUD_GATEWAY_HTTPCLIENT_WIRETAP: "true"
       AUTH_SERVICE_URL: http://auth-service:4005
+      SPRING_MAIN_WEB_APPLICATION_TYPE: reactive
     ports:
       - "4004:4004"
     networks:
@@ -226,12 +212,13 @@ services:
   prometheus:
     image: prom/prometheus:v2.45.0
     container_name: prometheus
-    restart: unless-stopped
+    restart: no
     user: "0:0"  # Run as root to access docker socket
     volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
+      - '--enable-feature=exemplar-storage'
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
@@ -250,42 +237,18 @@ services:
       - api-gateway
 
   loki:
-    image: grafana/loki:2.9.0
+    image: grafana/loki:main
     container_name: loki
-    restart: unless-stopped
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
     ports:
       - "3100:3100"
-    volumes:
-      - ./monitoring/loki/loki-config.yaml:/etc/loki/loki-config.yaml
-      - loki_data:/tmp/loki
-    command: -config.file=/etc/loki/loki-config.yaml
     networks:
       - healthcare-network
-
-  promtail:
-    image: grafana/promtail:2.9.0
-    container_name: promtail
-    restart: unless-stopped
-    user: "0:0"  # Run as root to access docker socket
-    volumes:
-      - /var/log:/var/log:ro
-      - ./monitoring/promtail/promtail.yaml:/etc/promtail/config.yml
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - healthcare-network
-    depends_on:
-      - loki
-    labels:
-      - "com.docker.compose.service=promtail"
-    environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:main
     container_name: grafana
-    restart: unless-stopped
+    restart: no
     ports:
       - "3000:3000"
     environment:
@@ -304,6 +267,20 @@ services:
     depends_on:
       - prometheus
       - loki
+      - tempo
+
+  tempo:
+    image: grafana/tempo:2.2.2
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./monitoring/tempo/tempo.yaml:/etc/tempo.yaml:ro
+      - ./monitoring/tempo/tempo-data:/tmp/tempo
+    ports:
+      - "3110:3100"  # Tempo
+      - "9411:9411" # zipkin
+    networks:
+      - healthcare-network
 
 networks:
   healthcare-network:

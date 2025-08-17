@@ -6,104 +6,108 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            # -------------------------
-            # Auth Service
-            # -------------------------
-            - id: auth-service
-              uri: http://auth-service:4005
-              predicates:
-                - Path=/api/auth/**
-              filters:
-                - StripPrefix=2
-                # Example:
-                # Gateway URL: /api/auth/login  -> Service URL: /login
+      routes:
+        # -------------------------
+        # Auth Service
+        # -------------------------
+        - id: auth-service
+          uri: http://auth-service:4005
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=2
+            # Gateway URL: /api/auth/login -> Service URL: /login
 
-            - id: api-docs-auth
-              uri: http://auth-service:4005
-              predicates:
-                - Path=/api-docs/auth/**
-              filters:
-                - RewritePath=/api-docs/auth,/v3/api-docs
-                # Gateway: /api-docs/auth -> Service: /v3/api-docs
+        - id: api-docs-auth
+          uri: http://auth-service:4005
+          predicates:
+            - Path=/api-docs/auth/**
+          filters:
+            - RewritePath=/api-docs/auth,/v3/api-docs
+            # Gateway: /api-docs/auth -> Service: /v3/api-docs
 
-            # -------------------------
-            # Patient Service
-            # -------------------------
-            - id: patient-service
-              uri: http://patient-service:4000
-              predicates:
-                - Path=/api/patients/**
-              filters:
-                - StripPrefix=1
-                - JwtValidation
-                # Gateway: /api/patients/123 -> Service: /123
+        # -------------------------
+        # Patient Service
+        # -------------------------
+        - id: patient-service
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/api/patients/**
+          filters:
+            - StripPrefix=1
+            # Remove JwtValidation filter until implemented
+            # Gateway: /api/patients/123 -> Service: /patients/123
 
-            - id: api-docs-patient
-              uri: http://patient-service:4000
-              predicates:
-                - Path=/api-docs/patient-service/**
-              filters:
-                - RewritePath=/api-docs/patient-service/(?<segment>.*), /v3/api-docs/${segment}
-                # Gateway: /api-docs/patient-service/patients -> Service: /v3/api-docs/patients
+        - id: api-docs-patient
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/api-docs/patient-service/**
+          filters:
+            - RewritePath=/api-docs/patient-service/(?<segment>.*),/v3/api-docs/$\{segment}
+            # Gateway: /api-docs/patient-service/patients -> Service: /v3/api-docs/patients
 
-            - id: patient-actuator
-              uri: http://patient-service:4000
-              predicates:
-                - Path=/actuator/patient/**
-              filters:
-                - RewritePath=/actuator/patient/(?<segment>.*), /actuator/${segment}
-                # Gateway: /actuator/patient/health -> Service: /actuator/health
+        - id: patient-actuator
+          uri: http://patient-service:4000
+          predicates:
+            - Path=/actuator/patient/**
+          filters:
+            - RewritePath=/actuator/patient/(?<segment>.*),/actuator/$\{segment}
+            # Gateway: /actuator/patient/health -> Service: /actuator/health
 
-            # -------------------------
-            # Billing Service
-            # -------------------------
-            - id: billing-service
-              uri: http://billing-service:4001
-              predicates:
-                - Path=/api/billing/**
-              filters:
-                - StripPrefix=1
-                # Gateway: /api/billing/123 -> Service: /123
+        # -------------------------
+        # Billing Service
+        # -------------------------
+        - id: billing-service
+          uri: http://billing-service:4001
+          predicates:
+            - Path=/api/billing/**
+          filters:
+            - StripPrefix=1
+            # Gateway: /api/billing/123 -> Service: /billing/123
 
-            - id: billing-actuator
-              uri: http://billing-service:4001
-              predicates:
-                - Path=/actuator/billing/**
-              filters:
-                - RewritePath=/actuator/billing/(?<segment>.*), /actuator/${segment}
-                # Gateway: /actuator/billing/health -> Service: /actuator/health
+        - id: billing-actuator
+          uri: http://billing-service:4001
+          predicates:
+            - Path=/actuator/billing/**
+          filters:
+            - RewritePath=/actuator/billing/(?<segment>.*),/actuator/$\{segment}
+            # Gateway: /actuator/billing/health -> Service: /actuator/health
 
-            # -------------------------
-            # Analytics Service
-            # -------------------------
-            - id: analytics-service
-              uri: http://analytics-service:4002
-              predicates:
-                - Path=/api/analytics/**
-              filters:
-                - StripPrefix=1
-                # Gateway: /api/analytics/reports -> Service: /reports
+        # -------------------------
+        # Analytics Service
+        # -------------------------
+        - id: analytics-service
+          uri: http://analytics-service:4002
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - StripPrefix=1
+            # Gateway: /api/analytics/reports -> Service: /analytics/reports
 
-            - id: analytics-actuator
-              uri: http://analytics-service:4002
-              predicates:
-                - Path=/actuator/analytics/**
-              filters:
-                - RewritePath=/actuator/analytics/(?<segment>.*), /actuator/${segment}
-                # Gateway: /actuator/analytics/metrics -> Service: /actuator/metrics
+        - id: analytics-actuator
+          uri: http://analytics-service:4002
+          predicates:
+            - Path=/actuator/analytics/**
+          filters:
+            - RewritePath=/actuator/analytics/(?<segment>.*),/actuator/$\{segment}
+            # Gateway: /actuator/analytics/metrics -> Service: /actuator/metrics
 
-            # -------------------------
-            # Gateway Actuator
-            # -------------------------
-            - id: gateway-actuator
-              uri: http://localhost:4004
-              predicates:
-                - Path=/actuator/**
-                # Access API Gateway actuator itself
-                # Gateway: /actuator/health -> Service: Gateway actuator health
+        # -------------------------
+        # Gateway Actuator (Self)
+        # -------------------------
+        - id: gateway-actuator
+          uri: http://localhost:4004
+          predicates:
+            - Path=/actuator/**
+          # No filters needed for self-actuator endpoints
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
 management:
   endpoints:
@@ -113,7 +117,12 @@ management:
   endpoint:
     health:
       show-details: always
+    gateway:
+      enabled: true
   metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
     enable:
       kafka: true
     tags:
@@ -123,3 +132,6 @@ management:
     metrics:
       export:
         enabled: true
+  observations:
+    key-values:
+      application: api-gateway

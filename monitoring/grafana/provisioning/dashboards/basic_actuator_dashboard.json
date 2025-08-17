@@ -119,7 +119,7 @@
       "title": "API Gateway Logs",
       "datasource": {
         "type": "loki",
-        "uid": "${DS_LOKI}"
+        "uid": "DS_LOKI"
       },
       "targets": [
         {
@@ -197,7 +197,7 @@
       "title": "Analytics Service Logs",
       "datasource": {
         "type": "loki",
-        "uid": "${DS_LOKI}"
+        "uid": "DS_LOKI"
       },
       "targets": [
         {

@@ -9,12 +9,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 
 @Component
 public class JwtValidationGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
-  Logger log = LoggerFactory.getLogger(JwtValidationGatewayFilterFactory.class);
-
+  private static final Logger log = LoggerFactory.getLogger(JwtValidationGatewayFilterFactory.class);
   private final WebClient webClient;
 
   public JwtValidationGatewayFilterFactory(WebClient.Builder webClientBuilder,
@@ -27,31 +29,31 @@ public class JwtValidationGatewayFilterFactory extends AbstractGatewayFilterFact
     return (exchange, chain) -> {
       String path = exchange.getRequest().getURI().getPath();
 
-      // Skip JWT validation for login and register endpoints
-      if (path.startsWith("/auth/login") || path.startsWith("/auth/register")) {
+      if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/register")) {
         return chain.filter(exchange);
       }
 
-      String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-
-      log.debug("Incoming request to {} with token: {}", path, token);
-
-      if (token == null || !token.startsWith("Bearer ")) {
-        log.warn("Missing or invalid Authorization header");
-        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        return exchange.getResponse().setComplete();
-      }
-
-      log.debug("Validating token with Auth Service...");
-
-      return webClient.get()
-              .uri("/validate")
-              .header(HttpHeaders.AUTHORIZATION, token)
-              .retrieve()
-              .toBodilessEntity()
-              .doOnSuccess(response -> log.debug("Token validated successfully"))
-              .doOnError(error -> log.error("Token validation failed: {}", error.getMessage()))
-              .then(chain.filter(exchange));
+      return validateToken(exchange, chain);
     };
+  }
+
+  private Mono<Void> validateToken(ServerWebExchange exchange, GatewayFilterChain chain) {
+    String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+
+    if (token == null || !token.startsWith("Bearer ")) {
+      log.warn("Missing or invalid Authorization header for request to {}", exchange.getRequest().getURI().getPath());
+      exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+      return exchange.getResponse().setComplete();
+    }
+
+    log.debug("Validating token with Auth Service...");
+    return webClient.get()
+            .uri("/validate")
+            .header(HttpHeaders.AUTHORIZATION, token)
+            .retrieve()
+            .toBodilessEntity()
+            .doOnSuccess(response -> log.debug("Token validation successful."))
+            .doOnError(error -> log.error("Token validation failed: {}", error.getMessage()))
+            .then(chain.filter(exchange));
   }
 }

@@ -30,6 +30,7 @@ datasources:
       nodeGraph:
         enabled: true
 
+#TODO: Cred ca trebuie adaugat si uid sa fie asa
   - name: DS_LOKI
     type: loki
     uid: loki

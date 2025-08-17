@@ -6,36 +6,35 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      observability:
+        enabled: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
-        # -------------------------
-        # Auth Service
-        # -------------------------
         - id: auth-service
           uri: http://auth-service:4005
           predicates:
             - Path=/api/auth/**
           filters:
             - StripPrefix=2
-            # Gateway URL: /api/auth/login -> Service URL: /login
-
-        - id: api-docs-auth
-          uri: http://auth-service:4005
-          predicates:
-            - Path=/api-docs/auth/**
-          filters:
-            - RewritePath=/api-docs/auth,/v3/api-docs
-            # Gateway: /api-docs/auth -> Service: /v3/api-docs
-
-        # -------------------------
-        # Patient Service
-        # -------------------------
         - id: patient-service
           uri: http://patient-service:4000
           predicates:
             - Path=/api/patients/**
           filters:
             - StripPrefix=1
-            # Remove JwtValidation filter until implemented
+            - JwtValidation
+        - id: billing-service
+          uri: http://billing-service:4001
+          predicates:
+            - Path=/api/billing/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
             # Gateway: /api/patients/123 -> Service: /patients/123
 
         - id: api-docs-patient
@@ -43,7 +42,7 @@ spring:
           predicates:
             - Path=/api-docs/patient-service/**
           filters:
-            - RewritePath=/api-docs/patient-service/(?<segment>.*),/v3/api-docs/$\{segment}
+            - RewritePath=/api-docs/patient-service(?<segment>.*),/v3/api-docs$\{segment}
             # Gateway: /api-docs/patient-service/patients -> Service: /v3/api-docs/patients
 
         - id: patient-actuator
@@ -63,6 +62,7 @@ spring:
             - Path=/api/billing/**
           filters:
             - StripPrefix=1
+            - JwtValidation  # Add JWT validation filter
             # Gateway: /api/billing/123 -> Service: /billing/123
 
         - id: billing-actuator
@@ -82,6 +82,7 @@ spring:
             - Path=/api/analytics/**
           filters:
             - StripPrefix=1
+            - JwtValidation  # Add JWT validation filter
             # Gateway: /api/analytics/reports -> Service: /analytics/reports
 
         - id: analytics-actuator
@@ -101,14 +102,39 @@ spring:
             - Path=/actuator/**
           # No filters needed for self-actuator endpoints
 
+      # Global filter configuration
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+      # HTTP client configuration
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 10s
+        pool:
+          max-connections: 500
+
+# Auth service configuration
+auth:
+  service:
+    url: http://auth-service:4005
+
+# WebClient configuration
+webclient:
+  connect-timeout: 5000
+  read-timeout: 10000
+  write-timeout: 10000
+
 logging:
   level:
     root: INFO
     org.springframework.cloud.gateway: DEBUG
     org.springframework.web.reactive: DEBUG
+    io.micrometer.tracing: DEBUG
+    com.pm.apigateway: DEBUG
   pattern:
-    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level [%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
 
+# Management endpoints and tracing configuration
 management:
   endpoints:
     web:
@@ -123,6 +149,7 @@ management:
     distribution:
       percentiles-histogram:
         http.server.requests: true
+        gateway.requests: true
     enable:
       kafka: true
     tags:
@@ -135,3 +162,19 @@ management:
   observations:
     key-values:
       application: api-gateway
+      environment: dev
+  # Distributed Tracing Configuration
+  tracing:
+    sampling:
+      probability: 1.0  # Sample 100% of traces (reduce in production to 0.1)
+    zipkin:
+      endpoint: http://tempo:9411/api/v2/spans  # Tempo Zipkin-compatible endpoint
+
+# Additional resilience patterns (optional)
+resilience4j:
+  circuitbreaker:
+    instances:
+      authService:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        sliding-window-size: 10

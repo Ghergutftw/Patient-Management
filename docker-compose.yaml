@@ -17,9 +17,6 @@ services:
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"
       MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
       MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_SERVICE_NAME: patient-service
     networks:
       - healthcare-network
     depends_on:
@@ -60,9 +57,6 @@ services:
     environment:
       SERVER_PORT: 4002
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_SERVICE_NAME: patient-service
     networks:
       - healthcare-network
     depends_on:
@@ -87,9 +81,6 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
       JWT_SECRET: oIubescPeBiancaMultMultMultMultMultMultMultMultMultMultMultMultMult
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_SERVICE_NAME: patient-service
     networks:
       - healthcare-network
     depends_on:
@@ -129,9 +120,6 @@ services:
       HTTP_PORT: 4001
       GRPC_PORT: 9001
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_SERVICE_NAME: patient-service
     networks:
       - healthcare-network
     depends_on:
@@ -200,9 +188,6 @@ services:
       SPRING_CLOUD_GATEWAY_HTTPCLIENT_WIRETAP: "true"
       AUTH_SERVICE_URL: http://auth-service:4005
       SPRING_MAIN_WEB_APPLICATION_TYPE: reactive
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
-      OTEL_SERVICE_NAME: patient-service
     ports:
       - "4004:4004"
     networks:
@@ -276,22 +261,6 @@ services:
     depends_on:
       - prometheus
       - loki
-      - tempo
-
-  tempo:
-    image: grafana/tempo:2.2.2
-    container_name: tempo
-    command: [ "-config.file=/etc/tempo.yaml" ]
-    volumes:
-      - ./monitoring/tempo/tempo.yaml:/etc/tempo.yaml:ro
-      - ./monitoring/tempo/tempo-data:/tmp/tempo
-    ports:
-      - "3110:3100"   # Tempo HTTP
-      - "9411:9411"   # Zipkin
-      - "4317:4317"   # OTLP gRPC
-      - "4318:4318"   # OTLP HTTP
-    networks:
-      - healthcare-network
 
 networks:
   healthcare-network:

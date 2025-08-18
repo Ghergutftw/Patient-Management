@@ -7,12 +7,10 @@
     <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="Merge fara tracing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/pm/apigateway/filter/JwtValidationGatewayFilterFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/pm/apigateway/filter/JwtValidationGatewayFilterFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/17175_rev2.json" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/17175_rev2.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/basic_actuator_dashboard.json" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/dashboards/basic_actuator_dashboard.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monitoring/grafana/provisioning/datasources/datasources.yml" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring/grafana/provisioning/datasources/datasources.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monitoring/tempo/tempo.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +58,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="refactoring-easy-monitoring" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -80,6 +78,10 @@
             <RecentBranchesForRepo>
               <option name="branches">
                 <list>
+                  <RecentBranch>
+                    <option name="branchName" value="without-tracing" />
+                    <option name="lastUsedInstant" value="1755535283" />
+                  </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="refactoring-easy-monitoring" />
                     <option name="lastUsedInstant" value="1755455394" />
@@ -223,7 +225,7 @@
     "database.data.extractors.current.export.id": "HTML-Groovy.html.groovy",
     "database.data.extractors.current.id": "HTML-Groovy.html.groovy",
     "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "refactoring-easy-monitoring",
+    "git-widget-placeholder": "without-tracing",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/patient-service/src/main/resources",
     "node.js.detected.package.eslint": "true",
@@ -519,6 +521,7 @@
       <workItem from="1755461447330" duration="2249000" />
       <workItem from="1755463747004" duration="2398000" />
       <workItem from="1755466257136" duration="1725000" />
+      <workItem from="1755534552728" duration="1448000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -630,7 +633,8 @@
     <MESSAGE value="-Rest testing with RestAssured" />
     <MESSAGE value="-LocalStack for cloud" />
     <MESSAGE value="Merge fara tracing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge fara tracing" />
+    <MESSAGE value="O sa il fac" />
+    <option name="LAST_COMMIT_MESSAGE" value="O sa il fac" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -4,6 +4,7 @@ import billing.BillingRequest;
 import billing.BillingResponse;
 import billing.BillingServiceGrpc;
 import io.grpc.stub.StreamObserver;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -11,6 +12,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @GrpcService
 @Slf4j
 @RequiredArgsConstructor
+@Observed
 public class BillingGrpcService extends BillingServiceGrpc.BillingServiceImplBase {
 
 

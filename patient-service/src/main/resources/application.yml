@@ -53,6 +53,12 @@ server:
     enabled: true
 
 management:
+  otlp:
+    tracing:
+      endpoint: http://tempo:4317  #
+      protocol: grpc
+      timeout: 10s   # increase for Docker networking latency
+
   endpoints:
     web:
       exposure:

@@ -18,13 +18,26 @@ logging:
     correlation: "[${spring.application.name},%X{traceId:-},%X{spanId:-}]"
 
 management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0   # adjust for production
+
+  otlp:
+    tracing:
+      endpoint: http://tempo:4317
+      protocol: grpc
+      timeout: 30s
+
   endpoints:
     web:
       exposure:
         include: "*"
+
   endpoint:
     health:
       show-details: always
+
   metrics:
     distribution:
       percentiles-histogram:
@@ -34,6 +47,7 @@ management:
     tags:
       application: billing-service
       environment: dev
+
   prometheus:
     metrics:
       export:

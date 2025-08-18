@@ -5,12 +5,14 @@ import billing.BillingResponse;
 import billing.BillingServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.micrometer.observation.annotation.Observed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@Observed
 public class BillingServiceGrpcClient {
 
     private final BillingServiceGrpc.BillingServiceBlockingStub blockingStub;

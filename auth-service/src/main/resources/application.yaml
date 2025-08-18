@@ -9,29 +9,23 @@ logging:
   level:
     root: info
   pattern:
-    correlation: "[${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+    console: "[${spring.application.name},%X{traceId:-},%X{spanId:-}] %-5level %logger{36} - %msg%n"
 
+# --- Tempo Tracing Only ---
 management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0   # 100% sample, adjust in production
+  otlp:
+    tracing:
+      endpoint: http://tempo:4317  # Tempo OTLP gRPC endpoint
+
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: '*'
+
   endpoint:
     health:
       show-details: always
-  metrics:
-    distribution:
-      percentiles-histogram:
-        http.server.requests: true
-    enable:
-      kafka: true
-    tags:
-      application: auth-service
-      environment: dev
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  observations:
-      key-values:
-          application: auth-service

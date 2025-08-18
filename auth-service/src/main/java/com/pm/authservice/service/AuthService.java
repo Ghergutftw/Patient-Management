@@ -5,12 +5,14 @@ import com.pm.authservice.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import java.util.Optional;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@Observed
 public class AuthService {
 
     private final UserService userService;

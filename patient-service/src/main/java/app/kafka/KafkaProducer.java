@@ -1,6 +1,7 @@
 package app.kafka;
 
 import app.model.Patient;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -10,6 +11,7 @@ import patient.events.PatientEvent;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Observed
 public class KafkaProducer {
 
     private final KafkaTemplate<String, byte[]> kafkaTemplate;

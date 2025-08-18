@@ -1,5 +1,8 @@
 services:
   patient-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
     image: patient-service:latest
     container_name: patient-service
     restart: no
@@ -14,7 +17,6 @@ services:
       BILLING_SERVICE_GRPC_PORT: 9001
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       # Enable actuator endpoints
-      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"
       MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
       MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
     networks:
@@ -51,6 +53,9 @@ services:
       retries: 5
 
   analytics-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
     image: analytics-service:latest
     container_name: analytics-service
     restart: no
@@ -70,6 +75,9 @@ services:
       start_period: 30s
 
   auth-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
     image: auth-service:latest
     container_name: auth-service
     restart: no
@@ -113,6 +121,9 @@ services:
       retries: 5
 
   billing-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
     image: billing-service:latest
     container_name: billing-service
     restart: no
@@ -178,6 +189,9 @@ services:
       - monitoring
 
   api-gateway:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
     image: api-gateway:latest
     container_name: api-gateway
     restart: no
@@ -234,8 +248,6 @@ services:
     image: grafana/loki:main
     container_name: loki
     command: [ "-config.file=/etc/loki/local-config.yaml" ]
-    ports:
-      - "3100:3100"
     networks:
       - healthcare-network
 
@@ -261,6 +273,16 @@ services:
     depends_on:
       - prometheus
       - loki
+
+  tempo:
+    image: grafana/tempo:2.2.2
+    container_name: tempo
+    ports:
+      - "3100:3100"   # Tempo HTTP
+      - "4317:4317"   # OTLP gRPC
+    volumes:
+      - ./monitoring/tempo/tempo.yml:/etc/tempo.yml
+    command: [ "-config.file=/etc/tempo.yml" ]
 
 networks:
   healthcare-network:

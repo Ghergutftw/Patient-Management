@@ -124,6 +124,7 @@ webclient:
   read-timeout: 10000
   write-timeout: 10000
 
+
 logging:
   level:
     root: INFO
@@ -136,6 +137,9 @@ logging:
 
 # Management endpoints and tracing configuration
 management:
+  otlp:
+    tracing:
+      endpoint: http://tempo:4317
   endpoints:
     web:
       exposure:
@@ -165,10 +169,9 @@ management:
       environment: dev
   # Distributed Tracing Configuration
   tracing:
+    enabled: true
     sampling:
       probability: 1.0  # Sample 100% of traces (reduce in production to 0.1)
-    zipkin:
-      endpoint: http://tempo:9411/api/v2/spans  # Tempo Zipkin-compatible endpoint
 
 # Additional resilience patterns (optional)
 resilience4j:

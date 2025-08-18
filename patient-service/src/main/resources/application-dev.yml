@@ -1,27 +1,29 @@
 spring:
   application:
     name: patient-service
+
   datasource:
     url: jdbc:postgresql://localhost:5432/mydatabase
     username: myuser
     password: secret
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: create
     show-sql: true
-    database:
     open-in-view: false
+
   devtools:
     restart:
       enabled: false
     livereload:
       enabled: false
+
   sql:
     init:
       mode: always
-  #     Inhibits the creation of tables based on entities
-  #      mode: never
+
   jackson:
     date-format: yyyy-MM-dd
     time-zone: UTC
@@ -36,6 +38,26 @@ springdoc:
 logging:
   level:
     root: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%traceId,%spanId] %-5level %logger{36} - %msg%n"
 
 server:
   port: 8080
+
+# --- Observability / Tracing Config ---
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0   # 100% sample (adjust in prod, maybe 0.1 or 0.01)
+  otlp:
+    tracing:
+      endpoint: http://tempo:4317  # Tempo gRPC OTLP endpoint (4317)
+    metrics:
+      export:
+        enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: '*'

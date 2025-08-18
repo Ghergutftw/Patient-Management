@@ -6,33 +6,31 @@ spring:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+
 logging:
   level:
     root: info
   pattern:
-    correlation: "[${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+    console: "[${spring.application.name},%X{traceId:-},%X{spanId:-}] %-5level %logger{36} - %msg%n"
 
+server:
+  port: 8082
+
+# --- Tempo Tracing Only ---
 management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0   # sample 100% of traces, reduce in production
+  otlp:
+    tracing:
+      endpoint: http://tempo:4317   # Tempo OTLP gRPC endpoint
+
   endpoints:
     web:
       exposure:
         include: '*'
+
   endpoint:
     health:
       show-details: always
-  metrics:
-    distribution:
-      percentiles-histogram:
-        http.server.requests: true
-    enable:
-      kafka: true
-    tags:
-      application: patient-service # change per service
-      environment: dev
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  observations:
-    key-values:
-      application: patient-service

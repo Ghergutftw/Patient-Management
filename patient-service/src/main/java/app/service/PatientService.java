@@ -7,6 +7,7 @@ import app.kafka.KafkaProducer;
 import app.mapper.PatientMapper;
 import app.model.Patient;
 import app.repository.PatientRepository;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
+@Observed
 public class PatientService {
 
     private final PatientRepository patientRepository;

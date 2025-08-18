@@ -107,6 +107,8 @@
                 <configuration>
                     <image>
                         <name>${project.artifactId}:latest</name>
+                        <pullPolicy>NEVER</pullPolicy>
+
                     </image>
                 </configuration>
             </plugin>

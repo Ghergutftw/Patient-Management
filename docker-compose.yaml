@@ -183,9 +183,7 @@ services:
     restart: no
     environment:
       SERVER_PORT: 4004
-      LOGGING_LEVEL_ROOT: DEBUG
-      SPRING_CLOUD_GATEWAY_HTTPSERVER_WIRETAP: "true"
-      SPRING_CLOUD_GATEWAY_HTTPCLIENT_WIRETAP: "true"
+      LOGGING_LEVEL_ROOT: INFO   # or WARN to reduce log verbosity
       AUTH_SERVICE_URL: http://auth-service:4005
       SPRING_MAIN_WEB_APPLICATION_TYPE: reactive
     ports:

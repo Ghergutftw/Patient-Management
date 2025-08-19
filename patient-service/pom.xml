@@ -13,7 +13,7 @@
 <!--	<version>0.0.1</version>-->
 	<name>patient-service</name>
 	<description>patient-service</description>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<url/>
 
 	<profiles>

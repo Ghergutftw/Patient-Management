@@ -108,4 +108,4 @@ Use the maven → Plugins → spring-boot → build-image goal to create a Docke
 
 The internal network is being created
 - Inside Intellij Go to Services → Docker → Network → Create Network
-- ![img_1.png](img_1.png)
+- ![img_1.png](Jenkins_plugins.png)

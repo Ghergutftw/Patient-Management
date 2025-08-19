@@ -4,16 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="Jenkins 1st attempt">
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="Jenkins 2nd attempt&#10;Separated Pom.xmls">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analytics-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/analytics-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auth-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/billing-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/billing-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/patient-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/patient-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -531,7 +524,7 @@
       <workItem from="1755607311485" duration="26000" />
       <workItem from="1755607364789" duration="73000" />
       <workItem from="1755607449540" duration="60000" />
-      <workItem from="1755640808351" duration="5129000" />
+      <workItem from="1755640808351" duration="6109000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -621,7 +614,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755642762564</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Jenkins 2nd attempt&#10;Separated Pom.xmls">
+      <option name="closed" value="true" />
+      <created>1755646766594</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1755646766594</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -656,7 +657,8 @@
     <MESSAGE value="Merge fara tracing" />
     <MESSAGE value="O sa il fac" />
     <MESSAGE value="Jenkins 1st attempt" />
-    <option name="LAST_COMMIT_MESSAGE" value="Jenkins 1st attempt" />
+    <MESSAGE value="Jenkins 2nd attempt&#10;Separated Pom.xmls" />
+    <option name="LAST_COMMIT_MESSAGE" value="Jenkins 2nd attempt&#10;Separated Pom.xmls" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

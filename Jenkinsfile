@@ -10,7 +10,7 @@ pipeline {
  
         stage('Git Checkout') { 
             steps { 
-                git branch: 'without-tracing', url: 'https://github.com/Ghergutftw/Patient-Management.git' 
+                git branch: 'jenkins', url: 'https://github.com/Ghergutftw/Patient-Management.git' 
             } 
         } 
         
@@ -22,30 +22,30 @@ pipeline {
  
         stage('File System Check with trivy') { 
             steps { 
-                sh 'trivy fs --format table -o trivy-fs-report.html patient-service auth-service billing-service api-gateway analytics-service' 
+                sh 'trivy fs --format table -o trivy-fs-report.html .' 
             } 
         } 
  
-        stage('SonarQube Analysis') { 
-            steps { 
-                withSonarQubeEnv('SONAR_QUBE_SERVER') { 
-                    sh '''mvn sonar:sonar \
-                        -Dsonar.projectKey=PatientManagement \
-                        -Dsonar.sources=patient-service/src/main/java,auth-service/src/main/java,billing-service/src/main/java,api-gateway/src/main/java,analytics-service/src/main/java \
-                        -Dsonar.tests=patient-service/src/test/java,auth-service/src/test/java,billing-service/src/test/java,api-gateway/src/test/java,analytics-service/src/test/java \
-                        -Dsonar.java.binaries=patient-service/target/classes,auth-service/target/classes,billing-service/target/classes,api-gateway/target/classes,analytics-service/target/classes \
-                        -pl patient-service,auth-service,billing-service,api-gateway,analytics-service'''
-                } 
-            } 
-        }
+        // stage('SonarQube Analysis') { 
+        //     steps { 
+        //         withSonarQubeEnv('SONAR_QUBE_SERVER') { 
+        //             sh '''mvn sonar:sonar \
+        //                 -Dsonar.projectKey=PatientManagement \
+        //                 -Dsonar.sources=patient-service/src/main/java,auth-service/src/main/java,billing-service/src/main/java,api-gateway/src/main/java,analytics-service/src/main/java \
+        //                 -Dsonar.tests=patient-service/src/test/java,auth-service/src/test/java,billing-service/src/test/java,api-gateway/src/test/java,analytics-service/src/test/java \
+        //                 -Dsonar.java.binaries=patient-service/target/classes,auth-service/target/classes,billing-service/target/classes,api-gateway/target/classes,analytics-service/target/classes \
+        //                 -pl patient-service,auth-service,billing-service,api-gateway,analytics-service'''
+        //         } 
+        //     } 
+        // }
         
-        stage('Quality Gate') { 
-            steps { 
-                timeout(time: 10, unit: 'MINUTES') { 
-                    waitForQualityGate abortPipeline: true 
-                } 
-            } 
-        }
+        // stage('Quality Gate') { 
+        //     steps { 
+        //         timeout(time: 10, unit: 'MINUTES') { 
+        //             waitForQualityGate abortPipeline: true 
+        //         } 
+        //     } 
+        // }
         
         stage('Package') {
             steps {

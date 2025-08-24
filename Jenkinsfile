@@ -1,3 +1,39 @@
+def deployServiceFromManifest(serviceName, namespace) {
+    sh """
+        echo "📄 Looking for k8s manifests for ${serviceName}..."
+        
+        # Try different possible locations for k8s manifests
+        if [ -f "k8s/${serviceName}.yaml" ]; then
+            MANIFEST_FILE="k8s/${serviceName}.yaml"
+        elif [ -f "k8s/${serviceName}-deployment.yaml" ]; then
+            MANIFEST_FILE="k8s/${serviceName}-deployment.yaml"
+        elif [ -f "k8s/deployments/${serviceName}.yaml" ]; then
+            MANIFEST_FILE="k8s/deployments/${serviceName}.yaml"
+        elif [ -f "k8s/services/${serviceName}.yaml" ]; then
+            MANIFEST_FILE="k8s/services/${serviceName}.yaml"
+        else
+            echo "❌ No k8s manifest found for ${serviceName}"
+            exit 1
+        fi
+        
+        echo "📝 Using manifest: \$MANIFEST_FILE"
+        
+        # Update namespace in the manifest if needed
+        sed "s/namespace: .*/namespace: ${namespace}/g" \$MANIFEST_FILE > ${serviceName}-k8s-updated.yaml
+        
+        # Update image tag if needed
+        sed -i "s|image: .*${serviceName}.*|image: ${env.DOCKER_IMAGE_NAME}:${serviceName}-${params.DOCKER_TAG}|g" ${serviceName}-k8s-updated.yaml
+        
+        echo "📝 Applying k8s manifest for ${serviceName}..."
+        kubectl apply -f ${serviceName}-k8s-updated.yaml
+        
+        echo "⏳ Waiting for ${serviceName} deployment to be ready..."
+        kubectl rollout status deployment/${serviceName} -n ${namespace} --timeout=${env.K8S_DEPLOYMENT_TIMEOUT}
+        
+        echo "✅ ${serviceName} deployed successfully from manifest"
+    """
+}
+
 pipeline {
     agent any
 
@@ -13,6 +49,13 @@ pipeline {
         booleanParam(name: 'ENABLE_TRIVY_FS_SCAN', defaultValue: true, description: 'Enable file system security scan')
         booleanParam(name: 'ENABLE_TRIVY_IMAGE_SCAN', defaultValue: true, description: 'Enable image security scan')
         booleanParam(name: 'CLEANUP_IMAGES', defaultValue: true, description: 'Cleanup local images after push')
+
+        booleanParam(name: 'DEPLOY_TO_K8S', defaultValue: false, description: 'Deploy to Kubernetes cluster')
+        booleanParam(name: 'DEPLOY_MONITORING', defaultValue: true, description: 'Deploy monitoring stack (Prometheus, Grafana, Loki)')
+       
+        string(name: 'K8S_NAMESPACE', defaultValue: 'patient-management-test', description: 'Kubernetes namespace for deployment')
+        string(name: 'K8S_CLUSTER_CONTEXT', defaultValue: 'your-cluster-context', description: 'Kubernetes cluster context')
+        string(name: 'K8S_NODE_COUNT', defaultValue: '2', description: 'Expected number of nodes in cluster')
     }
 
     tools {
@@ -28,10 +71,12 @@ pipeline {
 
         NEXUS_URL = "http://${params.NEXUS_IP}:8081"
         SONAR_URL = "http://${params.SONAR_IP}:9000"
+
+         KUBECONFIG = credentials('kubeconfig-credentials') // Add your kubeconfig credentials ID
+        K8S_DEPLOYMENT_TIMEOUT = '300s'
     }
 
     stages {
-
         stage('Display Parameters') {
             steps {
                 script {
@@ -295,8 +340,82 @@ pipeline {
                 }
             }
         }
-    }
 
+        stage('Deploy to Kubernetes') {
+            when { expression { params.DEPLOY_TO_K8S } }
+            steps {
+                script {
+                    def parentPom = readMavenPom file: 'pom.xml'
+                    def services = parentPom.modules
+                    
+                    echo "🚀 Starting Kubernetes deployment to namespace: ${params.K8S_NAMESPACE}"
+                    
+                    // Verify cluster connectivity and node count
+                    sh """
+                        echo "🔍 Verifying Kubernetes cluster connectivity..."
+                        kubectl cluster-info
+                        
+                        echo "📊 Checking cluster nodes..."
+                        ACTUAL_NODES=\$(kubectl get nodes --no-headers | wc -l)
+                        echo "Expected nodes: ${params.K8S_NODE_COUNT}"
+                        echo "Actual nodes: \$ACTUAL_NODES"
+                        
+                        if [ "\$ACTUAL_NODES" -lt "${params.K8S_NODE_COUNT}" ]; then
+                            echo "⚠️ Warning: Expected ${params.K8S_NODE_COUNT} nodes but found \$ACTUAL_NODES"
+                            echo "Continuing with deployment..."
+                        fi
+                        
+                        kubectl get nodes -o wide
+                    """
+                    
+                    // Create namespace if it doesn't exist
+                    sh """
+                        echo "🏗️ Creating namespace ${params.K8S_NAMESPACE} if it doesn't exist..."
+                        kubectl create namespace ${params.K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                        kubectl get namespace ${params.K8S_NAMESPACE}
+                    """
+                    
+                    // Deploy monitoring stack first if enabled
+                    if (params.DEPLOY_MONITORING) {
+                        echo "📊 Deploying monitoring stack using repository files..."
+                        deployMonitoringStackFromRepo(params.K8S_NAMESPACE)
+                    }
+                    
+                    // Deploy each service to Kubernetes using k8s manifests if available
+                    services.each { service ->
+                        echo "🚀 Deploying ${service} to Kubernetes..."
+                        
+                        // Check if k8s manifests exist for this service
+                        def k8sManifestExists = sh(
+                            script: "test -f k8s/${service}.yaml || test -f k8s/${service}-deployment.yaml || test -f k8s/deployments/${service}.yaml",
+                            returnStatus: true
+                        ) == 0
+                        
+                        if (k8sManifestExists) {
+                            echo "📄 Using existing k8s manifest for ${service}"
+                            deployServiceFromManifest(service, params.K8S_NAMESPACE)
+                        } else {
+                            echo "🏗️ Generating k8s manifest for ${service}"
+                            deployServiceDynamically(service, params.K8S_NAMESPACE, params.DOCKER_TAG)
+                        }
+                    }
+                    
+                    // Verify deployments are running on different nodes
+                    sh """
+                        echo "🔍 Verifying pod distribution across nodes..."
+                        kubectl get pods -n ${params.K8S_NAMESPACE} -o wide
+                        
+                        echo "📊 Pod distribution summary:"
+                        kubectl get pods -n ${params.K8S_NAMESPACE} -o jsonpath='{range .items[*]}{.spec.nodeName}{"\\n"}{end}' | sort | uniq -c
+                        
+                        echo "🎯 Deployment verification complete!"
+                    """
+                }
+                
+            }
+        }
+
+    }
     post {
         always {
             script {
@@ -368,4 +487,5 @@ pipeline {
             }
         }
     }
+
 }

@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="Jenkins 2nd attempt&#10;Separated Pom.xmls">
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="Sonar Plugin">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pipeline.md" beforeDir="false" afterPath="$PROJECT_DIR$/Pipeline.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -525,6 +526,8 @@
       <workItem from="1755607449540" duration="60000" />
       <workItem from="1755640808351" duration="6109000" />
       <workItem from="1755893335721" duration="1217000" />
+      <workItem from="1755983281646" duration="2238000" />
+      <workItem from="1756052867847" duration="4282000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -622,7 +625,23 @@
       <option name="project" value="LOCAL" />
       <updated>1755646766594</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Pushing to docker registry">
+      <option name="closed" value="true" />
+      <created>1755983344352</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1755983344352</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Sonar Plugin">
+      <option name="closed" value="true" />
+      <created>1756054211602</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1756054211602</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -658,7 +677,9 @@
     <MESSAGE value="O sa il fac" />
     <MESSAGE value="Jenkins 1st attempt" />
     <MESSAGE value="Jenkins 2nd attempt&#10;Separated Pom.xmls" />
-    <option name="LAST_COMMIT_MESSAGE" value="Jenkins 2nd attempt&#10;Separated Pom.xmls" />
+    <MESSAGE value="Pushing to docker registry" />
+    <MESSAGE value="Sonar Plugin" />
+    <option name="LAST_COMMIT_MESSAGE" value="Sonar Plugin" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

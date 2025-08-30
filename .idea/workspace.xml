@@ -4,16 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="Functioneaza Jenkins corect">
-      <change afterPath="$PROJECT_DIR$/k8s/monitoring/grafana-datasources.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/k8s/monitoring/grafana-deployment.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/k8s/monitoring/grafana-service.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/k8s/monitoring/loki-service.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/k8s/monitoring/prometheus-config.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/k8s/monitoring/prometheus-deployment.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/k8s/monitoring/prometheus-service.yml" afterDir="false" />
+    <list default="true" id="1d3274b4-0943-4c5f-9e9f-874e4c03f4fb" name="Changes" comment="staring k8s">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +53,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="without-tracing" />
+        <entry key="$PROJECT_DIR$" value="jenkins" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -81,6 +73,10 @@
             <RecentBranchesForRepo>
               <option name="branches">
                 <list>
+                  <RecentBranch>
+                    <option name="branchName" value="k8s" />
+                    <option name="lastUsedInstant" value="1756074654" />
+                  </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="jenkins" />
                     <option name="lastUsedInstant" value="1755606919" />
@@ -229,7 +225,7 @@
     "database.data.extractors.current.export.id": "HTML-Groovy.html.groovy",
     "database.data.extractors.current.id": "HTML-Groovy.html.groovy",
     "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "jenkins",
+    "git-widget-placeholder": "k8s",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/madal/Desktop/Files/Projects/patient-managment/k8s/monitoring",
     "node.js.detected.package.eslint": "true",
@@ -533,7 +529,7 @@
       <workItem from="1755640808351" duration="6109000" />
       <workItem from="1755893335721" duration="1217000" />
       <workItem from="1755983281646" duration="2238000" />
-      <workItem from="1756052867847" duration="5943000" />
+      <workItem from="1756052867847" duration="6884000" />
     </task>
     <task id="LOCAL-00001" summary="-Sequence number generator&#10;-ControllerAdvice with Custom Exception">
       <option name="closed" value="true" />
@@ -655,7 +651,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756072629171</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="staring k8s">
+      <option name="closed" value="true" />
+      <created>1756074670646</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1756074670646</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -694,7 +698,8 @@
     <MESSAGE value="Pushing to docker registry" />
     <MESSAGE value="Sonar Plugin" />
     <MESSAGE value="Functioneaza Jenkins corect" />
-    <option name="LAST_COMMIT_MESSAGE" value="Functioneaza Jenkins corect" />
+    <MESSAGE value="staring k8s" />
+    <option name="LAST_COMMIT_MESSAGE" value="staring k8s" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

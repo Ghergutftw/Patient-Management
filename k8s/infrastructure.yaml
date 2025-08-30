@@ -1,0 +1,186 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+  namespace: patient-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - name: kafka
+        image: bitnami/kafka:latest
+        ports:
+        - containerPort: 9092
+        - containerPort: 9093
+        env:
+        - name: KAFKA_CFG_NODE_ID
+          value: "0"
+        - name: KAFKA_CFG_PROCESS_ROLES
+          value: "controller,broker"
+        - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
+          value: "0@kafka:9093"
+        - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
+          value: "CONTROLLER"
+        - name: KAFKA_CFG_LISTENERS
+          value: "PLAINTEXT://:9092,CONTROLLER://:9093"
+        - name: KAFKA_CFG_ADVERTISED_LISTENERS
+          value: "PLAINTEXT://kafka:9092"
+        - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+          value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+        - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
+          value: "true"
+        volumeMounts:
+        - name: kafka-data
+          mountPath: /bitnami/kafka
+      volumes:
+      - name: kafka-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: patient-management
+spec:
+  selector:
+    app: kafka
+  ports:
+  - name: kafka
+    port: 9092
+    targetPort: 9092
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patient-service-db
+  namespace: patient-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: patient-service-db
+  template:
+    metadata:
+      labels:
+        app: patient-service-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        envFrom:
+        - configMapRef:
+            name: postgres-config
+        volumeMounts:
+        - name: patient-db-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: patient-db-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: patient-service-db
+  namespace: patient-management
+spec:
+  selector:
+    app: patient-service-db
+  ports:
+  - port: 5432
+    targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-db
+  namespace: patient-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service-db
+  template:
+    metadata:
+      labels:
+        app: auth-service-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        envFrom:
+        - configMapRef:
+            name: postgres-config
+        volumeMounts:
+        - name: auth-db-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: auth-db-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-db
+  namespace: patient-management
+spec:
+  selector:
+    app: auth-service-db
+  ports:
+  - port: 5432
+    targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: patient-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: "admin"
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "admin"
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+      volumes:
+      - name: grafana-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: patient-management
+spec:
+  selector:
+    app: grafana
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: LoadBalancer

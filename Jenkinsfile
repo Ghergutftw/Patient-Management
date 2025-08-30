@@ -1,36 +1,6 @@
-def deployServiceFromManifest(serviceName, namespace) {
+def updateImageInManifest(serviceName, imageName, imageTag) {
     sh """
-        echo "📄 Looking for k8s manifests for ${serviceName}..."
-        
-        # Try different possible locations for k8s manifests
-        if [ -f "k8s/${serviceName}.yaml" ]; then
-            MANIFEST_FILE="k8s/${serviceName}.yaml"
-        elif [ -f "k8s/${serviceName}-deployment.yaml" ]; then
-            MANIFEST_FILE="k8s/${serviceName}-deployment.yaml"
-        elif [ -f "k8s/deployments/${serviceName}.yaml" ]; then
-            MANIFEST_FILE="k8s/deployments/${serviceName}.yaml"
-        elif [ -f "k8s/services/${serviceName}.yaml" ]; then
-            MANIFEST_FILE="k8s/services/${serviceName}.yaml"
-        else
-            echo "❌ No k8s manifest found for ${serviceName}"
-            exit 1
-        fi
-        
-        echo "📝 Using manifest: \$MANIFEST_FILE"
-        
-        # Update namespace in the manifest if needed
-        sed "s/namespace: .*/namespace: ${namespace}/g" \$MANIFEST_FILE > ${serviceName}-k8s-updated.yaml
-        
-        # Update image tag if needed
-        sed -i "s|image: .*${serviceName}.*|image: ${env.DOCKER_IMAGE_NAME}:${serviceName}-${params.DOCKER_TAG}|g" ${serviceName}-k8s-updated.yaml
-        
-        echo "📝 Applying k8s manifest for ${serviceName}..."
-        kubectl apply -f ${serviceName}-k8s-updated.yaml
-        
-        echo "⏳ Waiting for ${serviceName} deployment to be ready..."
-        kubectl rollout status deployment/${serviceName} -n ${namespace} --timeout=${env.K8S_DEPLOYMENT_TIMEOUT}
-        
-        echo "✅ ${serviceName} deployed successfully from manifest"
+        sed 's|image: ${serviceName}:.*|image: ${imageName}:${serviceName}-${imageTag}|g' k8s/microservices.yaml > k8s/microservices-updated.yaml
     """
 }
 
@@ -40,22 +10,17 @@ pipeline {
     parameters {
         string(name: 'NEXUS_IP', defaultValue: '35.174.104.227', description: 'Nexus server IP address')
         string(name: 'SONAR_IP', defaultValue: '52.91.189.5', description: 'SonarQube server IP address')
-        string(name: 'DOCKER_TAG', defaultValue: 'latest', description: 'Docker image tag to use')
+        string(name: 'DOCKER_TAG', defaultValue: 'latest', description: 'Docker image tag to deploy')
         string(name: 'GIT_BRANCH', defaultValue: 'jenkins', description: 'Git branch to checkout')
-        booleanParam(name: 'SKIP_TESTS', defaultValue: true, description: 'Skip running tests')
+
+        booleanParam(name: 'ENABLE_TESTS', defaultValue: false, description: 'Enable running tests')
         booleanParam(name: 'ENABLE_SONAR', defaultValue: false, description: 'Enable SonarQube analysis')
         booleanParam(name: 'ABORT_ON_QUALITY_GATE_FAILURE', defaultValue: false, description: 'Abort pipeline if Quality Gate fails')
         booleanParam(name: 'DEPLOY_TO_NEXUS', defaultValue: false, description: 'Deploy artifacts to Nexus')
         booleanParam(name: 'ENABLE_TRIVY_FS_SCAN', defaultValue: true, description: 'Enable file system security scan')
         booleanParam(name: 'ENABLE_TRIVY_IMAGE_SCAN', defaultValue: true, description: 'Enable image security scan')
         booleanParam(name: 'CLEANUP_IMAGES', defaultValue: true, description: 'Cleanup local images after push')
-
-        booleanParam(name: 'DEPLOY_TO_K8S', defaultValue: false, description: 'Deploy to Kubernetes cluster')
-        booleanParam(name: 'DEPLOY_MONITORING', defaultValue: true, description: 'Deploy monitoring stack (Prometheus, Grafana, Loki)')
-       
-        string(name: 'K8S_NAMESPACE', defaultValue: 'patient-management-test', description: 'Kubernetes namespace for deployment')
-        string(name: 'K8S_CLUSTER_CONTEXT', defaultValue: 'your-cluster-context', description: 'Kubernetes cluster context')
-        string(name: 'K8S_NODE_COUNT', defaultValue: '2', description: 'Expected number of nodes in cluster')
+        booleanParam(name: 'DEPLOY_TO_K8S', defaultValue: true, description: 'Deploy to Kubernetes cluster')
     }
 
     tools {
@@ -68,37 +33,14 @@ pipeline {
         NEXUS_CREDENTIALS = 'nexus-credentials'
         DOCKER_HUB_CREDENTIALS = 'docker-hub-credentials'
         SONAR_SERVER = 'SONAR_QUBE_SERVER'
+        KUBECONFIG = credentials('kubeconfig-credentials')
 
         NEXUS_URL = "http://${params.NEXUS_IP}:8081"
         SONAR_URL = "http://${params.SONAR_IP}:9000"
-
-         KUBECONFIG = credentials('kubeconfig-credentials') // Add your kubeconfig credentials ID
         K8S_DEPLOYMENT_TIMEOUT = '300s'
     }
 
     stages {
-        stage('Display Parameters') {
-            steps {
-                script {
-                    echo "🔧 Pipeline Parameters:"
-                    echo "Git Branch: ${params.GIT_BRANCH}"
-                    echo "Nexus IP: ${params.NEXUS_IP}"
-                    echo "Nexus Full URL: ${env.NEXUS_URL}"
-                    echo "SonarQube IP: ${params.SONAR_IP}"
-                    echo "SonarQube Full URL: ${env.SONAR_URL}"
-                    echo "Docker Tag: ${params.DOCKER_TAG}"
-                    echo "Skip Tests: ${params.SKIP_TESTS}"
-                    echo "Enable SonarQube: ${params.ENABLE_SONAR}"
-                    echo "Abort on Quality Gate Failure: ${params.ABORT_ON_QUALITY_GATE_FAILURE}"
-                    echo "Deploy to Nexus: ${params.DEPLOY_TO_NEXUS}"
-                    echo "Enable Trivy FS Scan: ${params.ENABLE_TRIVY_FS_SCAN}"
-                    echo "Enable Trivy Image Scan: ${params.ENABLE_TRIVY_IMAGE_SCAN}"
-                    echo "Cleanup Images: ${params.CLEANUP_IMAGES}"
-                    echo "Docker Image Name: ${env.DOCKER_IMAGE_NAME}"
-                }
-            }
-        }
-
         stage('Git Checkout') {
             steps {
                 git branch: "${params.GIT_BRANCH}", url: 'https://github.com/Ghergutftw/Patient-Management.git'
@@ -110,15 +52,14 @@ pipeline {
                 script {
                     def parentPom = readMavenPom file: 'pom.xml'
                     env.SERVICES = parentPom.modules.join(',')
-                    echo "📦 Services detected from parent POM: ${env.SERVICES}"
-                    echo "📋 Individual services: ${parentPom.modules}"
+                    echo "Services detected: ${parentPom.modules}"
                 }
             }
         }
 
-        stage('Compile') {
+        stage('Package') {
             steps {
-                sh "mvn compile -pl ${env.SERVICES}"
+                sh "mvn package ${params.ENABLE_TESTS ? '' : '-DskipTests'} -pl ${env.SERVICES}"
             }
         }
 
@@ -179,14 +120,14 @@ pipeline {
                             // Use the same SonarQube server URL as configured in the analysis
                             def qg = waitForQualityGate(abortPipeline: false)
                             if (qg.status != 'OK') {
-                                echo "⚠️ Quality Gate failed: ${qg.status}"
+                                echo "Quality Gate failed: ${qg.status}"
                                 if (params.ABORT_ON_QUALITY_GATE_FAILURE) {
                                     error("Quality Gate failed")
                                 } else {
-                                    echo "🔄 Continuing pipeline despite Quality Gate failure (as per configuration)"
+                                    echo "Continuing pipeline despite Quality Gate failure (as per configuration)"
                                 }
                             } else {
-                                echo "✅ Quality Gate passed successfully"
+                                echo "Quality Gate passed successfully"
                             }
                         }
                     } catch (Exception e) {
@@ -197,7 +138,7 @@ pipeline {
                         if (params.ABORT_ON_QUALITY_GATE_FAILURE) {
                             error("Quality Gate check failed: ${e.getMessage()}")
                         } else {
-                            echo "🔄 Continuing pipeline despite Quality Gate error (as per configuration)"
+                            echo "Continuing pipeline despite Quality Gate error (as per configuration)"
                         }
                     }
                 }
@@ -206,7 +147,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh "mvn package ${params.SKIP_TESTS ? '-DskipTests' : ''} -pl ${env.SERVICES}"
+                sh "mvn package ${params.ENABLE_TESTS ? '' : '-DskipTests'} -pl ${env.SERVICES}"
             }
         }
 
@@ -252,18 +193,18 @@ pipeline {
 
                     services.each { service ->
                         dir(service) {
-                            echo "🏗️ Building Docker image for ${service}..."
+                            echo "Building Docker image for ${service}..."
 
-                            // Build Docker image using Spring Boot build-image with default name first
+                            // Build Docker image using Spring Boot build-image
                             sh "mvn spring-boot:build-image -Dspring-boot.build-image.imageName=${service}:${params.DOCKER_TAG} -DskipTests"
 
-                            // Tag the image with your desired name
+                            // Tag the image with registry name
                             sh "docker tag ${service}:${params.DOCKER_TAG} ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
 
                             // Verify the image was tagged correctly
                             sh "docker images | grep ${env.DOCKER_IMAGE_NAME}"
 
-                            echo "✅ Successfully built and tagged ${service}"
+                            echo "Successfully built and tagged ${service}"
                         }
                     }
                 }
@@ -278,16 +219,16 @@ pipeline {
                     def services = parentPom.modules
 
                     services.each { service ->
-                        echo "🔍 Scanning image: ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
+                        echo "Scanning image: ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
 
                         // Verify image exists before scanning
                         sh """
                             if docker inspect ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG} > /dev/null 2>&1; then
-                                echo "✅ Image found, starting Trivy scan..."
+                                echo "Image found, starting Trivy scan..."
                                 trivy image --format table -o trivy-${service}-image-report.html ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}
-                                echo "✅ Trivy scan completed for ${service}"
+                                echo "Trivy scan completed for ${service}"
                             else
-                                echo "❌ Image ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG} not found"
+                                echo "Image ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG} not found"
                                 echo "Available images:"
                                 docker images | grep patient-managment || echo "No patient-managment images found"
                                 exit 1
@@ -306,15 +247,15 @@ pipeline {
 
                     withDockerRegistry([credentialsId: "${env.DOCKER_HUB_CREDENTIALS}", url: 'https://index.docker.io/v1/']) {
                         services.each { service ->
-                            echo "🚀 Pushing image: ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
+                            echo "Pushing image: ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
 
                             def image = docker.image("${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}")
                             image.push()
 
-                            // Also push with just 'latest' tag for the main service image
+                            // Also push with latest tag
                             image.push("${service}-latest")
 
-                            echo "✅ Successfully pushed ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
+                            echo "Successfully pushed ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
                         }
                     }
                 }
@@ -328,7 +269,7 @@ pipeline {
                     def parentPom = readMavenPom file: 'pom.xml'
                     def services = parentPom.modules
 
-                    echo "🧹 Cleaning up local images to save space..."
+                    echo "Cleaning up local images to save space..."
                     services.each { service ->
                         // Remove the local build images to save space
                         sh "docker rmi ${service}:${params.DOCKER_TAG} || true"
@@ -345,75 +286,169 @@ pipeline {
             when { expression { params.DEPLOY_TO_K8S } }
             steps {
                 script {
-                    def parentPom = readMavenPom file: 'pom.xml'
-                    def services = parentPom.modules
+                    echo "Deploying to Kubernetes cluster"
                     
-                    echo "🚀 Starting Kubernetes deployment to namespace: ${params.K8S_NAMESPACE}"
+                    // Update image tags in microservices manifest
+                    def services = ['patient-service', 'billing-service', 'auth-service', 'analytics-service', 'api-gateway']
                     
-                    // Verify cluster connectivity and node count
-                    sh """
-                        echo "🔍 Verifying Kubernetes cluster connectivity..."
-                        kubectl cluster-info
-                        
-                        echo "📊 Checking cluster nodes..."
-                        ACTUAL_NODES=\$(kubectl get nodes --no-headers | wc -l)
-                        echo "Expected nodes: ${params.K8S_NODE_COUNT}"
-                        echo "Actual nodes: \$ACTUAL_NODES"
-                        
-                        if [ "\$ACTUAL_NODES" -lt "${params.K8S_NODE_COUNT}" ]; then
-                            echo "⚠️ Warning: Expected ${params.K8S_NODE_COUNT} nodes but found \$ACTUAL_NODES"
-                            echo "Continuing with deployment..."
-                        fi
-                        
-                        kubectl get nodes -o wide
-                    """
+                    sh "cp k8s/microservices.yaml k8s/microservices-updated.yaml"
                     
-                    // Create namespace if it doesn't exist
-                    sh """
-                        echo "🏗️ Creating namespace ${params.K8S_NAMESPACE} if it doesn't exist..."
-                        kubectl create namespace ${params.K8S_NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
-                        kubectl get namespace ${params.K8S_NAMESPACE}
-                    """
-                    
-                    // Deploy monitoring stack first if enabled
-                    if (params.DEPLOY_MONITORING) {
-                        echo "📊 Deploying monitoring stack using repository files..."
-                        deployMonitoringStackFromRepo(params.K8S_NAMESPACE)
-                    }
-                    
-                    // Deploy each service to Kubernetes using k8s manifests if available
                     services.each { service ->
-                        echo "🚀 Deploying ${service} to Kubernetes..."
-                        
-                        // Check if k8s manifests exist for this service
-                        def k8sManifestExists = sh(
-                            script: "test -f k8s/${service}.yaml || test -f k8s/${service}-deployment.yaml || test -f k8s/deployments/${service}.yaml",
-                            returnStatus: true
-                        ) == 0
-                        
-                        if (k8sManifestExists) {
-                            echo "📄 Using existing k8s manifest for ${service}"
-                            deployServiceFromManifest(service, params.K8S_NAMESPACE)
-                        } else {
-                            echo "🏗️ Generating k8s manifest for ${service}"
-                            deployServiceDynamically(service, params.K8S_NAMESPACE, params.DOCKER_TAG)
-                        }
+                        sh """
+                            sed -i 's|image: ${service}:.*|image: ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}|g' k8s/microservices-updated.yaml
+                        """
+                        echo "Updated ${service} image to ${env.DOCKER_IMAGE_NAME}:${service}-${params.DOCKER_TAG}"
                     }
                     
-                    // Verify deployments are running on different nodes
+                    // Deploy infrastructure
+                    echo "Deploying infrastructure components..."
+                    sh "kubectl apply -f k8s/patient-management-namespace.yaml"
+                    sh "kubectl apply -f k8s/postgres-configmap.yaml"
+                    sh "kubectl apply -f k8s/infrastructure.yaml"
+                    
+                    // Wait for infrastructure
+                    echo "Waiting for infrastructure to be ready..."
                     sh """
-                        echo "🔍 Verifying pod distribution across nodes..."
-                        kubectl get pods -n ${params.K8S_NAMESPACE} -o wide
-                        
-                        echo "📊 Pod distribution summary:"
-                        kubectl get pods -n ${params.K8S_NAMESPACE} -o jsonpath='{range .items[*]}{.spec.nodeName}{"\\n"}{end}' | sort | uniq -c
-                        
-                        echo "🎯 Deployment verification complete!"
+                        kubectl wait --for=condition=available --timeout=300s deployment/patient-service-db -n patient-management || echo "Warning: patient-service-db timeout"
+                        kubectl wait --for=condition=available --timeout=300s deployment/auth-service-db -n patient-management || echo "Warning: auth-service-db timeout"
+                        kubectl wait --for=condition=available --timeout=300s deployment/kafka -n patient-management || echo "Warning: kafka timeout"
+                        kubectl wait --for=condition=available --timeout=300s deployment/grafana -n patient-management || echo "Warning: grafana timeout"
                     """
+                    
+                    // Deploy microservices
+                    echo "Deploying microservices..."
+                    sh "kubectl apply -f k8s/microservices-updated.yaml"
+                    
+                    // Wait for microservices
+                    services.each { service ->
+                        echo "Waiting for ${service} to be ready..."
+                        sh """
+                            kubectl wait --for=condition=available --timeout=300s deployment/${service} -n patient-management || echo "Warning: ${service} timeout"
+                            kubectl rollout status deployment/${service} -n patient-management --timeout=60s || echo "Warning: ${service} rollout timeout"
+                        """
+                    }
+                    
+                    echo "Deployment completed successfully"
                 }
-                
+            }
+            post {
+                failure {
+                    script {
+                        echo "Deployment failed, attempting rollback..."
+                        def services = ['patient-service', 'billing-service', 'auth-service', 'analytics-service', 'api-gateway']
+                        services.each { service ->
+                            sh "kubectl rollout undo deployment/${service} -n patient-management || echo 'Cannot rollback ${service}'"
+                        }
+                        // Also rollback infrastructure if needed
+                        sh "kubectl rollout undo deployment/grafana -n patient-management || echo 'Cannot rollback grafana'"
+                    }
+                }
             }
         }
+
+        stage('Verify Kubernetes Deployment') {
+            when { expression { params.DEPLOY_TO_K8S } }
+            steps {
+                script {
+                    echo "Verifying Kubernetes deployment..."
+                    
+                    sh "kubectl get pods -n patient-management -o wide"
+                    sh "kubectl get services -n patient-management"
+                    sh "kubectl get deployments -n patient-management"
+                    
+                    // Check API Gateway access
+                    echo "Checking API Gateway accessibility..."
+                    sh """
+                        GATEWAY_IP=\$(kubectl get service api-gateway -n patient-management -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+                        if [ -n "\$GATEWAY_IP" ] && [ "\$GATEWAY_IP" != "null" ]; then
+                            echo "API Gateway LoadBalancer IP: http://\$GATEWAY_IP:4004"
+                        else
+                            NODE_PORT=\$(kubectl get service api-gateway -n patient-management -o jsonpath='{.spec.ports[0].nodePort}' 2>/dev/null || echo "")
+                            if [ -n "\$NODE_PORT" ] && [ "\$NODE_PORT" != "null" ]; then
+                                echo "API Gateway NodePort: \$NODE_PORT (use any node IP)"
+                            else
+                                echo "Use port-forward to access API Gateway:"
+                                echo "kubectl port-forward service/api-gateway 4004:4004 -n patient-management"
+                            fi
+                        fi
+                    """
+                    
+                    // Check Grafana access
+                    echo "Checking Grafana accessibility..."
+                    sh """
+                        GRAFANA_IP=\$(kubectl get service grafana -n patient-management -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+                        if [ -n "\$GRAFANA_IP" ] && [ "\$GRAFANA_IP" != "null" ]; then
+                            echo "=============================================="
+                            echo "GRAFANA DASHBOARD ACCESS:"
+                            echo "URL: http://\$GRAFANA_IP:3000"
+                            echo "Username: admin"
+                            echo "Password: admin"
+                            echo "=============================================="
+                        else
+                            GRAFANA_NODE_PORT=\$(kubectl get service grafana -n patient-management -o jsonpath='{.spec.ports[0].nodePort}' 2>/dev/null || echo "")
+                            if [ -n "\$GRAFANA_NODE_PORT" ] && [ "\$GRAFANA_NODE_PORT" != "null" ]; then
+                                echo "=============================================="
+                                echo "GRAFANA DASHBOARD ACCESS:"
+                                echo "URL: http://<any-node-ip>:\$GRAFANA_NODE_PORT"
+                                echo "Username: admin"
+                                echo "Password: admin"
+                                echo "=============================================="
+                            else
+                                echo "=============================================="
+                                echo "GRAFANA DASHBOARD ACCESS:"
+                                echo "Use port-forward: kubectl port-forward service/grafana 3000:3000 -n patient-management"
+                                echo "Then access: http://localhost:3000"
+                                echo "Username: admin"
+                                echo "Password: admin"
+                                echo "=============================================="
+                            fi
+                        fi
+                    """
+                    
+                    // Display summary of access URLs
+                    echo "=============================================="
+                    echo "DEPLOYMENT SUMMARY"
+                    echo "=============================================="
+                    sh """
+                        echo "Namespace: patient-management"
+                        echo "Docker Images Tag: ${params.DOCKER_TAG}"
+                        echo ""
+                        echo "API GATEWAY:"
+                        GATEWAY_IP=\$(kubectl get service api-gateway -n patient-management -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+                        if [ -n "\$GATEWAY_IP" ] && [ "\$GATEWAY_IP" != "null" ]; then
+                            echo "  URL: http://\$GATEWAY_IP:4004"
+                        else
+                            NODE_PORT=\$(kubectl get service api-gateway -n patient-management -o jsonpath='{.spec.ports[0].nodePort}' 2>/dev/null || echo "")
+                            if [ -n "\$NODE_PORT" ] && [ "\$NODE_PORT" != "null" ]; then
+                                echo "  URL: http://<node-ip>:\$NODE_PORT"
+                            else
+                                echo "  URL: Use port-forward (see above)"
+                            fi
+                        fi
+                        
+                        echo ""
+                        echo "GRAFANA DASHBOARD:"
+                        GRAFANA_IP=\$(kubectl get service grafana -n patient-management -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+                        if [ -n "\$GRAFANA_IP" ] && [ "\$GRAFANA_IP" != "null" ]; then
+                            echo "  URL: http://\$GRAFANA_IP:3000"
+                        else
+                            GRAFANA_NODE_PORT=\$(kubectl get service grafana -n patient-management -o jsonpath='{.spec.ports[0].nodePort}' 2>/dev/null || echo "")
+                            if [ -n "\$GRAFANA_NODE_PORT" ] && [ "\$GRAFANA_NODE_PORT" != "null" ]; then
+                                echo "  URL: http://<node-ip>:\$GRAFANA_NODE_PORT"
+                            else
+                                echo "  URL: Use port-forward (see above)"
+                            fi
+                        fi
+                        echo "  Username: admin"
+                        echo "  Password: admin"
+                    """
+                    echo "=============================================="
+                    
+                    echo "Deployment verification completed"
+                }
+            }
+        }
+
 
     }
     post {
@@ -462,7 +497,7 @@ pipeline {
 
         failure {
             script {
-                echo "🔍 Pipeline failed. Debugging information:"
+                echo "Pipeline failed. Debugging information:"
                 sh '''
                     echo "=== All Docker Images ==="
                     docker images
@@ -476,14 +511,27 @@ pipeline {
                     echo "=== Available Disk Space ==="
                     df -h || true
                 '''
+                
+                if (params.DEPLOY_TO_K8S) {
+                    sh """
+                        echo "=== Kubernetes Debug Info ==="
+                        kubectl get all -n patient-management || true
+                        kubectl describe pods -n patient-management || true
+                    """
+                }
             }
         }
 
         success {
             script {
-                echo "🎉 Pipeline completed successfully!"
-                echo "📊 Check the Trivy reports for security scan results"
-                echo "🐳 Images pushed to: https://hub.docker.com/repository/docker/ghergutmadalin/patient-managment"
+                echo "Pipeline completed successfully!"
+                echo "Check the Trivy reports for security scan results"
+                echo "Images pushed to: https://hub.docker.com/repository/docker/ghergutmadalin/patient-managment"
+                
+                if (params.DEPLOY_TO_K8S) {
+                    echo "Application deployed to Kubernetes namespace: patient-management"
+                    echo "Access your application through the LoadBalancer services"
+                }
             }
         }
     }

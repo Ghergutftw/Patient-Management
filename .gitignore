@@ -14,6 +14,8 @@ coverage/
 libpeerconnection.log
 testem.log
 typings/
+data/
+db-data/
 
 # Spring Boot - Backend
 target/
@@ -77,3 +79,4 @@ Thumbs.db
 .env.production.local
 
 patient-service-db
+data/auth_service_data/base/1/112

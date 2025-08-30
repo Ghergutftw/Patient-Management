@@ -11,12 +11,14 @@ pipeline {
         string(name: 'NEXUS_IP', defaultValue: '35.174.104.227', description: 'Nexus server IP address')
         string(name: 'SONAR_IP', defaultValue: '52.91.189.5', description: 'SonarQube server IP address')
         string(name: 'DOCKER_TAG', defaultValue: 'latest', description: 'Docker image tag to deploy')
-        string(name: 'GIT_BRANCH', defaultValue: 'jenkins', description: 'Git branch to checkout')
+        string(name: 'GIT_BRANCH', defaultValue: 'k8s', description: 'Git branch to checkout')
 
         booleanParam(name: 'ENABLE_TESTS', defaultValue: false, description: 'Enable running tests')
         booleanParam(name: 'ENABLE_SONAR', defaultValue: false, description: 'Enable SonarQube analysis')
         booleanParam(name: 'ABORT_ON_QUALITY_GATE_FAILURE', defaultValue: false, description: 'Abort pipeline if Quality Gate fails')
         booleanParam(name: 'DEPLOY_TO_NEXUS', defaultValue: false, description: 'Deploy artifacts to Nexus')
+        booleanParam(name: 'BUILD_DOCKER_IMAGES', defaultValue: true, description: 'Build and tag Docker images')
+        booleanParam(name: 'PUSH_TO_DOCKER_REGISTRY', defaultValue: true, description: 'Push Docker images to registry')
         booleanParam(name: 'ENABLE_TRIVY_FS_SCAN', defaultValue: true, description: 'Enable file system security scan')
         booleanParam(name: 'ENABLE_TRIVY_IMAGE_SCAN', defaultValue: true, description: 'Enable image security scan')
         booleanParam(name: 'CLEANUP_IMAGES', defaultValue: true, description: 'Cleanup local images after push')
@@ -54,12 +56,6 @@ pipeline {
                     env.SERVICES = parentPom.modules.join(',')
                     echo "Services detected: ${parentPom.modules}"
                 }
-            }
-        }
-
-        stage('Package') {
-            steps {
-                sh "mvn package ${params.ENABLE_TESTS ? '' : '-DskipTests'} -pl ${env.SERVICES}"
             }
         }
 
@@ -145,12 +141,6 @@ pipeline {
             }
         }
 
-        stage('Package') {
-            steps {
-                sh "mvn package ${params.ENABLE_TESTS ? '' : '-DskipTests'} -pl ${env.SERVICES}"
-            }
-        }
-
         stage('Deploy to Nexus') {
             when { expression { params.DEPLOY_TO_NEXUS } }
             steps {
@@ -186,6 +176,7 @@ pipeline {
         }
 
         stage('Build and Tag Docker Images') {
+            when { expression { params.BUILD_DOCKER_IMAGES } }
             steps {
                 script {
                     def parentPom = readMavenPom file: 'pom.xml'
@@ -212,7 +203,12 @@ pipeline {
         }
 
         stage('Docker Image Security Scan with Trivy') {
-            when { expression { params.ENABLE_TRIVY_IMAGE_SCAN } }
+            when { 
+                allOf {
+                    expression { params.ENABLE_TRIVY_IMAGE_SCAN }
+                    expression { params.BUILD_DOCKER_IMAGES }
+                }
+            }
             steps {
                 script {
                     def parentPom = readMavenPom file: 'pom.xml'
@@ -240,6 +236,7 @@ pipeline {
         }
 
         stage('Push to Docker Registry') {
+            when { expression { params.PUSH_TO_DOCKER_REGISTRY } }
             steps {
                 script {
                     def parentPom = readMavenPom file: 'pom.xml'
@@ -263,7 +260,12 @@ pipeline {
         }
 
         stage('Cleanup Local Images') {
-            when { expression { params.CLEANUP_IMAGES } }
+            when { 
+                allOf {
+                    expression { params.CLEANUP_IMAGES }
+                    expression { params.BUILD_DOCKER_IMAGES }
+                }
+            }
             steps {
                 script {
                     def parentPom = readMavenPom file: 'pom.xml'

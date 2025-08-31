@@ -7,6 +7,13 @@ def updateImageInManifest(serviceName, imageName, imageTag) {
 pipeline {
     agent any
 
+    options {
+        // Keep only last 5 builds
+        buildDiscarder(logRotator(numToKeepStr: '3'))
+        // Clean workspace before build
+        skipDefaultCheckout(true)
+    }
+
     parameters {
         string(name: 'NEXUS_IP', defaultValue: '35.174.104.227', description: 'Nexus server IP address')
         string(name: 'SONAR_IP', defaultValue: '52.91.189.5', description: 'SonarQube server IP address')
@@ -43,6 +50,12 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        
         stage('Git Checkout') {
             steps {
                 git branch: "${params.GIT_BRANCH}", url: 'https://github.com/Ghergutftw/Patient-Management.git'

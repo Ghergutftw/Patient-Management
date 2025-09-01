@@ -46,7 +46,6 @@ pipeline {
 
         NEXUS_URL = "http://${params.NEXUS_IP}:8081"
         SONAR_URL = "http://${params.SONAR_IP}:9000"
-        K8S_DEPLOYMENT_TIMEOUT = '300s'
     }
 
     stages {
@@ -297,6 +296,26 @@ pipeline {
             }
         }
 
+        stage('Cleanup Kubernetes Cluster') {
+            when { expression { params.DEPLOY_TO_K8S } }
+            steps {
+                script {
+                    echo "Cleaning up existing Kubernetes resources..."
+                    
+                    // Delete all resources in the patient-management namespace
+                    sh """
+                        kubectl delete all --all -n patient-management || echo 'No resources to delete or namespace does not exist'
+                        kubectl delete configmaps --all -n patient-management || echo 'No configmaps to delete'
+                        kubectl delete secrets --all -n patient-management || echo 'No secrets to delete'
+                        kubectl delete pvc --all -n patient-management || echo 'No PVCs to delete'
+                        kubectl delete namespace patient-management || echo 'Namespace does not exist'
+                    """
+                    
+                    echo "Kubernetes cluster cleanup completed"
+                }
+            }
+        }
+
         stage('Deploy to Kubernetes') {
             when { expression { params.DEPLOY_TO_K8S } }
             steps {
@@ -326,10 +345,10 @@ pipeline {
                     echo "Deploying microservices..."
                     sh "kubectl apply -f k8s/microservices-updated.yaml"
                     
-                    // Wait for deployments to be ready
+                    // Wait for deployments to be ready (without timeout)
                     echo "Waiting for deployments to be ready..."
                     services.each { service ->
-                        sh "kubectl rollout status deployment/${service} -n patient-management --timeout=${env.K8S_DEPLOYMENT_TIMEOUT}"
+                        sh "kubectl rollout status deployment/${service} -n patient-management"
                     }
                     
                     echo "Deployment completed successfully"

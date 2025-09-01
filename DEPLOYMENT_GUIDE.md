@@ -123,6 +123,13 @@ kubectl get all -n patient-management
 
 ## 6. Jenkins Pipeline Configuration
 
+### Pipeline Features:
+- **Dependency-based deployment**: Services deploy in proper order (databases → Kafka → auth-service → core services → API gateway)
+- **Health checks**: Each layer waits for dependencies to be ready
+- **Buffer periods**: Adequate time between service starts
+- **Automatic rollback**: Failed deployments trigger automatic rollback
+- **Service verification**: Pipeline reports access URLs and health status
+
 ### Pipeline Parameters:
 - **DOCKER_TAG**: `latest` (or your preferred tag)
 - **GIT_BRANCH**: `k8s`
@@ -135,6 +142,15 @@ kubectl get all -n patient-management
 ### Required Jenkins Credentials:
 - `kubeconfig-credentials`: Kubernetes configuration file
 - `docker-hub-credentials`: Docker Hub username/password
+
+### Deployment Stages:
+1. **🏗️ Infrastructure**: Namespace, ConfigMaps
+2. **🗄️ Databases**: PostgreSQL instances with health checks
+3. **📨 Messaging**: Kafka with 30-second startup buffer
+4. **🔐 Authentication**: auth-service deployed first
+5. **🏥 Core Services**: patient-service, billing-service, analytics-service
+6. **🚪 Gateway**: api-gateway (depends on all services)
+7. **📊 Monitoring**: Grafana verification
 
 ## 7. Deployment Verification
 
@@ -220,6 +236,52 @@ kubectl get service grafana -n patient-management
 
 ## 9. Troubleshooting Commands
 
+### Dependency-Based Deployment Issues
+
+**Check deployment order and status:**
+```bash
+# Check overall deployment status
+kubectl get deployments -n patient-management
+
+# Verify deployment order (should be: DBs → Kafka → auth → core services → api-gateway)
+kubectl get deployments -n patient-management --sort-by=.metadata.creationTimestamp
+
+# Check which services are stuck
+kubectl get pods -n patient-management | grep -E "(Pending|CrashLoopBackOff|Error)"
+```
+
+**Database dependency issues:**
+```bash
+# Check if databases are ready before services start
+kubectl get pods -l app=patient-service-db -n patient-management
+kubectl get pods -l app=auth-service-db -n patient-management
+
+# Test database connectivity
+kubectl exec -it deployment/patient-service-db -n patient-management -- pg_isready -U myuser -d mydatabase
+kubectl exec -it deployment/auth-service-db -n patient-management -- pg_isready -U myuser -d mydatabase
+```
+
+**Kafka dependency issues:**
+```bash
+# Check Kafka status
+kubectl get pods -l app=kafka -n patient-management
+kubectl logs -l app=kafka -n patient-management --tail=20
+
+# Test Kafka connectivity
+kubectl exec -it deployment/kafka -n patient-management -- kafka-topics.sh --bootstrap-server localhost:9092 --list
+```
+
+**Service startup sequence issues:**
+```bash
+# Check if auth-service is ready before other services
+kubectl get pods -l app=auth-service -n patient-management
+kubectl logs -l app=auth-service -n patient-management --tail=20
+
+# Verify API Gateway waits for all services
+kubectl describe deployment api-gateway -n patient-management
+kubectl logs -l app=api-gateway -n patient-management --tail=30
+```
+
 ### Pod Issues
 ```bash
 # Check pod status and events
@@ -257,6 +319,37 @@ netstat -tlnp | grep <nodeport>
 
 # Test pod-to-pod connectivity
 kubectl run debug-pod --image=curlimages/curl -i --tty --rm -n patient-management -- curl http://api-gateway.patient-management.svc.cluster.local:4004/actuator/health
+```
+
+### Pipeline Deployment Failures
+
+**Check Jenkins pipeline logs for deployment stage failures:**
+```bash
+# If pipeline fails at dependency deployment, check specific components:
+
+# Database deployment failure
+kubectl get events -n patient-management | grep -E "(patient-service-db|auth-service-db)"
+kubectl describe deployment patient-service-db -n patient-management
+
+# Kafka deployment failure  
+kubectl get events -n patient-management | grep kafka
+kubectl describe deployment kafka -n patient-management
+
+# Service deployment failure
+kubectl get events -n patient-management | grep -E "(patient-service|auth-service|billing-service)"
+kubectl rollout status deployment/<failed-service> -n patient-management
+```
+
+**Manual rollback if pipeline rollback fails:**
+```bash
+# Rollback specific deployment
+kubectl rollout undo deployment/<service-name> -n patient-management
+
+# Check rollback status
+kubectl rollout status deployment/<service-name> -n patient-management
+
+# Force restart if needed
+kubectl rollout restart deployment/<service-name> -n patient-management
 ```
 
 ### Resource Issues
@@ -445,6 +538,65 @@ kubectl describe certificate krunky-xyz-tls -n patient-management
 - **Grafana Dashboard**: https://grafana.krunky.xyz
 - **Health Check**: https://api.krunky.xyz/actuator/health
 
+---
+
+## Quick Ingress Setup Guide
+
+### Option 1: Run Complete Deployment Script
+```bash
+# Run on Kubernetes master node
+./deploy-with-domain.sh
+
+# Script will output External IP - use this for GoDaddy DNS
+```
+
+### Option 2: Manual Step-by-Step Setup
+```bash
+# 1. Install NGINX Ingress Controller
+chmod +x k8s/install-ingress.sh
+./k8s/install-ingress.sh
+
+# 2. Install cert-manager for SSL
+chmod +x k8s/install-cert-manager.sh
+./k8s/install-cert-manager.sh
+
+# 3. Get External IP (wait 2-5 minutes for LoadBalancer)
+kubectl get service ingress-nginx-controller --namespace=ingress-nginx -w
+
+# 4. Deploy application
+kubectl apply -f k8s/patient-management-namespace.yaml
+kubectl apply -f k8s/postgres-configmap.yaml
+kubectl apply -f k8s/infrastructure.yaml
+kubectl apply -f k8s/microservices.yaml
+
+# 5. Apply ingress configuration
+kubectl apply -f k8s/ingress.yaml
+```
+
+### GoDaddy DNS Configuration
+
+1. **Login to GoDaddy:** https://dcc.godaddy.com/
+2. **Navigate to:** My Products → DNS → krunky.xyz → Manage DNS
+3. **Add these A records:**
+
+| Type | Name | Value | TTL |
+|------|------|-------|-----|
+| A | @ | `YOUR_EXTERNAL_IP` | 1 Hour |
+| A | api | `YOUR_EXTERNAL_IP` | 1 Hour |
+| A | grafana | `YOUR_EXTERNAL_IP` | 1 Hour |
+
+**Example:**
+```
+A    @        34.123.45.67    1 Hour
+A    api      34.123.45.67    1 Hour  
+| A    grafana  34.123.45.67    1 Hour
+```
+
+4. **Wait 5-60 minutes for DNS propagation**
+5. **Test:** `curl -I https://api.krunky.xyz/actuator/health`
+
+---
+
 ### Troubleshooting Domain Issues
 
 1. **DNS not resolving**:
@@ -474,4 +626,158 @@ kubectl describe certificate krunky-xyz-tls -n patient-management
 
 ---
 
-For additional support or issues, refer to the Kubernetes and Jenkins documentation or check the application logs for specific error messages.
+## Part 7: Deployment Process with Dependencies
+
+The Jenkins pipeline now follows proper dependency order similar to Docker Compose:
+
+### Deployment Sequence
+1. **🏗️ Infrastructure Setup** - Namespace & ConfigMaps
+2. **🗄️ Database Layer** - PostgreSQL databases with health checks
+3. **📨 Messaging Layer** - Kafka with proper startup time
+4. **🔐 Authentication Layer** - auth-service (first microservice)
+5. **🏥 Core Business Services** - patient-service, billing-service, analytics-service
+6. **🚪 Gateway Layer** - api-gateway (depends on all services)
+7. **📊 Monitoring Layer** - Grafana monitoring
+
+### Pipeline Features
+- **Sequential deployment** with proper wait conditions
+- **Health checks** for each layer before proceeding
+- **Buffer periods** between service starts
+- **Automatic rollback** on deployment failure
+- **Service verification** and access URL reporting
+
+---
+
+## Part 8: Cleanup and Maintenance
+
+### Quick Cleanup (Preserves Service Account)
+
+To stop all deployments while keeping Jenkins access:
+
+```bash
+# Remove application deployments
+kubectl delete deployments --all -n patient-management
+
+# Remove services
+kubectl delete services --all -n patient-management
+
+# Remove ingress configurations
+kubectl delete ingress --all -n patient-management
+
+# Remove configmaps
+kubectl delete configmap postgres-config -n patient-management
+
+# Remove persistent volume claims (this will delete data!)
+kubectl delete pvc --all -n patient-management
+
+# Remove SSL certificates
+kubectl delete secret krunky-xyz-tls -n patient-management --ignore-not-found
+kubectl delete secret letsencrypt-prod -n patient-management --ignore-not-found
+```
+
+### Complete Cleanup (Everything)
+
+To completely remove everything including Jenkins access:
+
+```bash
+# Remove the entire namespace (WARNING: This removes everything)
+kubectl delete namespace patient-management
+
+# Remove cluster-wide resources
+kubectl delete clusterrolebinding jenkins-deployer-admin
+kubectl delete clusterrole jenkins-deployer --ignore-not-found
+
+# Remove ingress controller (optional)
+kubectl delete namespace ingress-nginx
+
+# Remove cert-manager (optional)
+kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.2/cert-manager.yaml
+
+# Remove ClusterIssuer
+kubectl delete clusterissuer letsencrypt-prod --ignore-not-found
+```
+
+### Partial Cleanup Options
+
+**Remove only application services (keep infrastructure):**
+```bash
+kubectl delete deployment patient-service billing-service auth-service analytics-service api-gateway -n patient-management
+```
+
+**Remove only infrastructure (keep applications):**
+```bash
+kubectl delete deployment patient-service-db auth-service-db kafka grafana -n patient-management
+```
+
+**Scale down everything (preserve configuration):**
+```bash
+kubectl scale deployment --all --replicas=0 -n patient-management
+```
+
+**Scale back up:**
+```bash
+kubectl scale deployment --all --replicas=1 -n patient-management
+```
+
+### Verification Commands
+
+**Check what's running:**
+```bash
+# Overview of all resources
+kubectl get all -n patient-management
+
+# Detailed pod status
+kubectl get pods -n patient-management -o wide
+
+# Check persistent volumes
+kubectl get pv,pvc -n patient-management
+
+# Check service account (should remain after quick cleanup)
+kubectl get serviceaccount jenkins-deployer -n patient-management
+```
+
+**Check logs for troubleshooting:**
+```bash
+# Application logs
+kubectl logs -f deployment/api-gateway -n patient-management
+kubectl logs -f deployment/patient-service -n patient-management
+
+# Infrastructure logs
+kubectl logs -f deployment/kafka -n patient-management
+kubectl logs -f deployment/patient-service-db -n patient-management
+```
+
+### Maintenance Tasks
+
+**Update application images:**
+```bash
+# Update specific service
+kubectl set image deployment/patient-service patient-service=ghergutmadalin/patient-managment:patient-service-v2.0 -n patient-management
+
+# Restart deployment
+kubectl rollout restart deployment/patient-service -n patient-management
+
+# Check rollout status
+kubectl rollout status deployment/patient-service -n patient-management
+```
+
+**Database maintenance:**
+```bash
+# Backup database (example for patient-service-db)
+kubectl exec -it deployment/patient-service-db -n patient-management -- pg_dump -U myuser mydatabase > backup.sql
+
+# Access database shell
+kubectl exec -it deployment/patient-service-db -n patient-management -- psql -U myuser -d mydatabase
+```
+
+**Resource monitoring:**
+```bash
+# Check resource usage
+kubectl top pods -n patient-management
+kubectl top nodes
+
+# Check events
+kubectl get events -n patient-management --sort-by='.lastTimestamp'
+```
+
+---

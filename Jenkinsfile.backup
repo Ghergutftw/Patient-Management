@@ -413,6 +413,7 @@ pipeline {
                         ])
                     }
                 }
+
             }
 
             cleanup {
@@ -430,7 +431,9 @@ pipeline {
                         # Clean temporary files
                         sudo rm -rf /tmp/*
                     '''
+
                 }
+    
             }
         }
 
@@ -474,4 +477,5 @@ pipeline {
             }
         }
     }
+
 }
